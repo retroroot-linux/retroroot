@@ -1,0 +1,6 @@
+[submodule "buildroot"]
+	path = buildroot
+	url = git@github.com:retroroot-linux/buildroot.git
+[submodule "retroarch"]
+	path = retroarch
+	url = git@github.com:retroroot-linux/retroarch.git

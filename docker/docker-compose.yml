@@ -1,0 +1,11 @@
+version: "3.7"
+services:
+   retroroot-builder:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    privileged: true
+    stdin_open: true
+    tty: true
+    image: retroroot-builder:latest
+    container_name:  retroroot-builder
