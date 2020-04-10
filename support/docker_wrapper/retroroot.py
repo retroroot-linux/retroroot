@@ -21,13 +21,13 @@ class RetrorootDocker:
 
     def build(self):
         container_name="retroroot-builder"
-        # if self.containers.search(self.builder_name):
-        #     self.containers.stop(self.builder_name)
-        # self.logger.info("Setting up docker container: %s.", self.builder_name)
-        # self.env_check()
-        # self.shell.run_command_verbose("docker-compose -f .docker-compose.yml build")
-        # self.logger.info("Running %s.", self.builder_name)
-        # self.shell.run_command_verbose("docker-compose -f .docker-compose.yml up -d")
+        if self.containers.search(self.builder_name):
+            self.containers.stop(self.builder_name)
+        self.logger.info("Setting up docker container: %s.", self.builder_name)
+        self.env_check()
+        self.shell.run_command_verbose("docker-compose -f .docker-compose.yml build")
+        self.logger.info("Running %s.", self.builder_name)
+        self.shell.run_command_verbose("docker-compose -f .docker-compose.yml up -d")
         self.containers.exec_run(container_name, "cp utils/brmake /usr/bin/brmake", detach=False, workdir="/home/br-user/buildroot", stream=True)
         self.containers.exec_run(container_name, "make retroroot_x86_64_KMS_defconfig BR2_EXTERNAL=retroarch/package  O=output/x86_64/KMS", user="br-user", detach=False, workdir="/home/br-user/buildroot", stream=True)
         self.containers.exec_run(container_name, "brmake", user="br-user", detach=False, workdir="/home/br-user/buildroot/output/x86_64/KMS", stream=True)
