@@ -13,12 +13,14 @@ RUN dnf install -y \
   cpio \
   curl \
   dialog \
+  dwarves \
   expect \
   file \
   flex \
   gcc \
   gcc-c++ \
   git \
+  elfutils-libelf-devel \
   make \
   mc \
   nano \
@@ -75,7 +77,12 @@ RUN set -e; \
 
 COPY buildroot /home/br-user/buildroot
 WORKDIR /home/br-user/buildroot
-RUN ln -s /mnt/retroarch retroarch
+RUN set -e; \
+  rm -rf configs; \
+  ln -s /mnt/retroarch retroarch; \
+  ln -s /mnt/retroarch/configs configs; \
+  ln -s /mnt/build build; \
+  chown -R br-user:br-user /home/br-user;
 
 USER br-user
 ENV HOME /home/br-user

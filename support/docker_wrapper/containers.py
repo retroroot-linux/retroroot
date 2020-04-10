@@ -446,9 +446,10 @@ class PyDockerContainers:
             container.remove()
         return destroyed_containers
 
-    def __init__(self, logging_level=logging.INFO):
+    def __init__(self, verbose):
         """Initialize the class."""
         self.cli = docker.APIClient(base_url='unix://var/run/docker.sock')
+        logging_level = logging.DEBUG if verbose else logging.INFO
         self.client = docker.from_env()
         self.logger = Log(__name__, logging_level)
         self.shell = Shell(logging_level)
