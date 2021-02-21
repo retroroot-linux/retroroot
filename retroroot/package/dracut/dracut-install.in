@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -e
+
+LD_LIBRARY_PATH="$(dirname $0)/../lib:$(dirname $0)/../lib/systemd" $(dirname $0)/../lib/dracut/dracut-install "${@}"

@@ -1,0 +1,24 @@
+From db51ea2a7dc91ad6863aaa538d1798661e0f8070 Mon Sep 17 00:00:00 2001
+From: Adam Duskett <Aduskett@rivian.com>
+Date: Sat, 20 Feb 2021 19:10:44 -0800
+Subject: [PATCH] package/findutils: add host variant
+
+Needed for dracut
+
+Signed-off-by: Adam Duskett <Aduskett@rivian.com>
+---
+ package/findutils/findutils.mk | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/package/findutils/findutils.mk b/package/findutils/findutils.mk
+index 13d8271..278eeec 100644
+--- a/package/findutils/findutils.mk
++++ b/package/findutils/findutils.mk
+@@ -15,3 +15,4 @@ FINDUTILS_CONF_ENV = \
+ 	gl_cv_func_wcwidth_works=yes
+ 
+ $(eval $(autotools-package))
++$(eval $(host-autotools-package))
+-- 
+2.25.1
+

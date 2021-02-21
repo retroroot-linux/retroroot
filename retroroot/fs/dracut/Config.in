@@ -1,0 +1,35 @@
+config BR2_TARGET_ROOTFS_DRACUT
+	bool "dracut initramfs"
+	depends on !BR2_STATIC_LIBS # dracut -> kmod
+	depends on BR2_PACKAGE_HAS_UDEV # dracut -> runtime
+	depends on BR2_PACKAGE_BASH # dracut -> runtime
+	select BR2_PACKAGE_DRACUT
+	help
+	  Build a initramfs using dracut
+
+	  https://github.com/dracutdevs/dracut
+
+if BR2_TARGET_ROOTFS_DRACUT
+
+config BR2_PACKAGE_ROOTFS_KERNEL_MODULES
+	string "Kernel modules to include"
+	help
+	  Space seperated list of kernel modules of which to include
+
+config BR2_PACKAGE_ROOTFS_DRACUT_PLYMOUTH
+	bool "plymouth support"
+	depends on BR2_TOOLCHAIN_HAS_THREADS # plymouth -> dbus
+	depends on BR2_USE_MMU # plymouth -> dbus
+	select BR2_PACKAGE_PLYMOUTH
+	help
+	  plymouth support
+
+comment "plymouth support needs udev and a toolchain w/ threads, mmu"
+	depends on !BR2_PACKAGE_HAS_UDEV
+	depends on BR2_STATIC_LIBS
+
+endif
+
+comment "dracut needs udev and a toolchain w/ dynamic library"
+	depends on !BR2_PACKAGE_HAS_UDEV
+	depends on BR2_STATIC_LIBS

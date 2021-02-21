@@ -1,0 +1,4 @@
+config BR2_PACKAGE_RETROARCH_INITRD
+	bool "retroroot initrd"
+	help
+	  Initrd files for retroroot.

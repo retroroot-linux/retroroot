@@ -1,0 +1,12 @@
+[Unit]
+Description=OpenSSH server daemon
+After=syslog.target network.target auditd.service
+RequiresMountsFor=/data
+
+[Service]
+ExecStartPre=/bin/sh /usr/bin/generate_new_ssh_host_keys
+ExecStart=/usr/sbin/sshd -D -e
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target

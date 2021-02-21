@@ -1,0 +1,37 @@
+From 1e47223f7a1f112dc5672cc943a8b3c7fb001f45 Mon Sep 17 00:00:00 2001
+From: Adam Duskett <Aduskett@rivian.com>
+Date: Sat, 20 Feb 2021 15:41:20 -0800
+Subject: [PATCH] force symlink making
+
+This prevents subsequent rebuilds from failing if the symlinks already exist
+
+Signed-off-by: Adam Duskett <Aduskett@rivian.com>
+---
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 637e65b..01bd14c 100644
+--- a/Makefile
++++ b/Makefile
+@@ -155,7 +155,7 @@ endif
+ 		mkdir -p $(DESTDIR)$(systemdsystemunitdir); \
+ 		ln -srf $(DESTDIR)$(pkglibdir)/modules.d/98dracut-systemd/dracut-shutdown.service $(DESTDIR)$(systemdsystemunitdir)/dracut-shutdown.service; \
+ 		mkdir -p $(DESTDIR)$(systemdsystemunitdir)/sysinit.target.wants; \
+-		ln -s ../dracut-shutdown.service \
++		ln -sf ../dracut-shutdown.service \
+ 		$(DESTDIR)$(systemdsystemunitdir)/sysinit.target.wants/dracut-shutdown.service; \
+ 		mkdir -p $(DESTDIR)$(systemdsystemunitdir)/initrd.target.wants; \
+ 		for i in \
+@@ -168,7 +168,7 @@ endif
+ 		    dracut-pre-udev.service \
+ 		    ; do \
+ 			ln -srf $(DESTDIR)$(pkglibdir)/modules.d/98dracut-systemd/$$i $(DESTDIR)$(systemdsystemunitdir); \
+-			ln -s ../$$i \
++			ln -sf ../$$i \
+ 			$(DESTDIR)$(systemdsystemunitdir)/initrd.target.wants/$$i; \
+ 		done \
+ 	fi
+-- 
+2.25.1
+

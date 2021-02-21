@@ -1,0 +1,52 @@
+From 7977328d826a4d6de2714fc8dc7b50b273de458c Mon Sep 17 00:00:00 2001
+From: Adam Duskett <Aduskett@gmail.com>
+Date: Sat, 7 Mar 2020 14:52:24 -0800
+Subject: [PATCH] do not call ldconfig
+
+Buildroot does not run ldconfig by default
+
+Signed-off-by: Adam Duskett <Aduskett@gmail.com>
+---
+ dracut.sh | 19 -------------------
+ 1 file changed, 19 deletions(-)
+
+diff --git a/dracut.sh b/dracut.sh
+index 800a676..df72d9c 100755
+--- a/dracut.sh
++++ b/dracut.sh
+@@ -1926,11 +1926,6 @@ if [[ $do_strip = yes ]] ; then
+     done
+ fi
+ 
+-# cleanup empty ldconfig_paths directories
+-for d in $(ldconfig_paths); do
+-    rmdir -p --ignore-fail-on-non-empty "$initdir/$d" >/dev/null 2>&1
+-done
+-
+ if [[ $early_microcode = yes ]]; then
+     dinfo "*** Generating early-microcode cpio image ***"
+     ucode_dir=(amd-ucode intel-ucode)
+@@ -2087,20 +2082,6 @@ if [[ $kernel_only != yes ]]; then
+     fi
+ fi
+ 
+-if [[ $kernel_only != yes ]]; then
+-    # make sure that library links are correct and up to date
+-    for f in "$dracutsysrootdir"/etc/ld.so.conf "$dracutsysrootdir"/etc/ld.so.conf.d/*; do
+-        [[ -f $f ]] && inst_simple "${f#$dracutsysrootdir}"
+-    done
+-    if ! $DRACUT_LDCONFIG -r "$initdir" -f /etc/ld.so.conf; then
+-        if [[ $EUID = 0 ]]; then
+-            derror "ldconfig exited ungracefully"
+-        else
+-            derror "ldconfig might need uid=0 (root) for chroot()"
+-        fi
+-    fi
+-fi
+-
+ if [[ $do_strip = yes ]] && ! [[ $DRACUT_FIPS_MODE ]]; then
+     dinfo "*** Stripping files ***"
+     find "$initdir" -type f \
+-- 
+2.25.1
+

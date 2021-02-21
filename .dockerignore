@@ -1,3 +1,4 @@
-.git
-Dockerfile
-build
+retroroot/output/
+retroroot/dl/
+retroroot/source/
+retroroot/production/

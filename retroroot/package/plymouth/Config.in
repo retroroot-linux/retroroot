@@ -1,0 +1,29 @@
+config BR2_PACKAGE_PLYMOUTH
+	bool "plymouth"
+	depends on BR2_TOOLCHAIN_HAS_THREADS # dbus
+	depends on BR2_USE_MMU # dbus
+	depends on BR2_PACKAGE_HAS_UDEV
+	select BR2_PACKAGE_CAIRO
+	select BR2_PACKAGE_DBUS
+	select BR2_PACKAGE_LIBCAP
+	select BR2_PACKAGE_LIBPNG
+	help
+	  Plymouth is an application that runs very early in the boot
+	  process (even before the root filesystem is mounted!) that
+	  provides a graphical boot animation while the boot process
+	  happens in the background.
+
+	  https://github.com/freedesktop/plymouth
+
+if BR2_PACKAGE_PLYMOUTH
+
+config BR2_PACKAGE_PLYMOUTH_BOOT_LOGO
+	string "Path to bootlogo"
+	help
+	  Specify a path to a bootlogo png.
+
+endif
+
+comment "plymouth needs udev and a toolchain w/ threads"
+	depends on BR2_USE_MMU
+	depends on !BR2_PACKAGE_HAS_UDEV || !BR2_TOOLCHAIN_HAS_THREADS

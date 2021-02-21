@@ -1,0 +1,12 @@
+config BR2_PACKAGE_RETROARCH_ASSETS
+	bool "retroarch-assets"
+	depends on BR2_PACKAGE_RETROARCH
+	help
+	  Assets needed for RetroArch - e.g. menu drivers, etc.
+	  Also contains the official branding.
+
+	  https://github.com/libretro/retroarch-assets
+
+comment "retroarch needs a toolchain w/ dynamic library, threads, wchar"
+	depends on BR2_USE_MMU
+	depends on BR2_STATIC_LIBS || !BR2_TOOLCHAIN_HAS_THREADS || !BR2_USE_WCHAR

@@ -1,0 +1,17 @@
+menu "Games"
+source "$BR2_EXTERNAL_RETROROOT_PATH/package/retroarch/Config.in"
+source "$BR2_EXTERNAL_RETROROOT_PATH/package/retroarch-assets/Config.in"
+endmenu
+
+menu "System Utilities"
+source "$BR2_EXTERNAL_RETROROOT_PATH/package/plymouth/Config.in"
+endmenu
+
+menu "boot"
+source "$BR2_EXTERNAL_RETROROOT_PATH/package/dracut/Config.in"
+source "$BR2_EXTERNAL_RETROROOT_PATH/package/retroroot-initrd/Config.in"
+endmenu
+
+menu "Filesystem images"
+source "$BR2_EXTERNAL_RETROROOT_PATH/fs/dracut/Config.in"
+endmenu

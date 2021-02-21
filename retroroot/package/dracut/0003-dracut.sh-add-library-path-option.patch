@@ -1,0 +1,58 @@
+From b9545a912b233eb7576649921c3795ee9fcdd893 Mon Sep 17 00:00:00 2001
+From: Adam Duskett <Aduskett@rivian.com>
+Date: Sat, 20 Feb 2021 15:35:55 -0800
+Subject: [PATCH] dracut.sh: add library-path option
+
+Dracut.sh calls out to dracut-install which will use the default system
+library paths. This causes issues if the host system doesn't have libkmod
+installed.
+
+Add the new option --library-path, which if set, exports LD_LIBRARY_PATH before
+calling dracut-install
+
+Signed-off-by: Adam Duskett <Aduskett@rivian.com>
+---
+ dracut.sh | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/dracut.sh b/dracut.sh
+index df72d9c..885c921 100755
+--- a/dracut.sh
++++ b/dracut.sh
+@@ -119,6 +119,7 @@ Creates initial ramdisk images for preloading modules
+   --noprefix            Do not prefix initramfs files
+   --mdadmconf           Include local /etc/mdadm.conf
+   --nomdadmconf         Do not include local /etc/mdadm.conf
++  --library-path        Specify a library path of which to use
+   --lvmconf             Include local /etc/lvm/lvm.conf
+   --nolvmconf           Do not include local /etc/lvm/lvm.conf
+   --fscks [LIST]        Add a space-separated list of fsck helpers.
+@@ -359,6 +360,7 @@ rearrange_params()
+         --long libdirs: \
+         --long fscks: \
+         --long add-fstab: \
++        --long library-path: \
+         --long mount: \
+         --long device: \
+         --long add-device: \
+@@ -538,6 +540,7 @@ while :; do
+         --libdirs)     libdirs_l+=("$2");                     PARMS_TO_STORE+=" '$2'"; shift;;
+         --fscks)       fscks_l+=("$2");                       PARMS_TO_STORE+=" '$2'"; shift;;
+         --add-fstab)   add_fstab_l+=("$2");                   PARMS_TO_STORE+=" '$2'"; shift;;
++        --library-path) library_path="$2"; shift;;
+         --mount)       fstab_lines+=("$2");                   PARMS_TO_STORE+=" '$2'"; shift;;
+         --add-device|--device) add_device_l+=("$2");          PARMS_TO_STORE+=" '$2'"; shift;;
+         --kernel-cmdline) kernel_cmdline_l+=("$2");           PARMS_TO_STORE+=" '$2'"; shift;;
+@@ -1057,6 +1060,9 @@ fi
+ 
+ if ! [[ $print_cmdline ]]; then
+     inst "$DRACUT_TESTBIN"
++    if [ -n "${library_path}" ]; then
++      export LD_LIBRARY_PATH="${library_path}"
++    fi
+     if ! $DRACUT_INSTALL ${initdir:+-D "$initdir"} ${dracutsysrootdir:+-r "$dracutsysrootdir"} -R "$DRACUT_TESTBIN" &>/dev/null; then
+         unset DRACUT_RESOLVE_LAZY
+         export DRACUT_RESOLVE_DEPS=1
+-- 
+2.25.1
+

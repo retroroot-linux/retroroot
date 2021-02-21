@@ -1,0 +1,19 @@
+config BR2_PACKAGE_DRACUT
+	bool "dracut"
+	depends on !BR2_STATIC_LIBS # kmod
+	depends on BR2_PACKAGE_HAS_UDEV # runtime
+	depends on BR2_PACKAGE_BASH # runtime
+	select BR2_PACKAGE_BASH_COMPLETION
+	select BR2_PACKAGE_KMOD
+	select BR2_PACKAGE_PKGCONF
+	help
+	  dracut (the tool) is used to create an initramfs image by
+	  copying tools and files from an installed system and combining
+	  it with the dracut framework, usually found in
+	  /usr/lib/dracut/modules.d.
+
+	  https://github.com/dracutdevs/dracut
+
+comment "dracut needs udev and a toolchain w/ dynamic library"
+	depends on !BR2_PACKAGE_HAS_UDEV
+	depends on BR2_STATIC_LIBS

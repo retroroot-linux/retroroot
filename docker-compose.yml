@@ -1,0 +1,25 @@
+version: "3.7"
+services:
+   buildroot-retroroot-build:
+    build:
+      context: ./
+      args:
+         BUILDROOT_USER: br-user
+         BUILDROOT_DIR: buildroot
+         BUILDROOT_VERSION: 2021.02-rc2
+         EXTERNAL_TREES: retroroot
+         BUILDROOT_PATCH_DIR: "retroroot/patches/buildroot/"
+         UID: 1000
+         GID: 1000
+    env_file:
+      - docker/env
+    privileged: true
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./:/mnt
+      - buildroot-retroroot-build-ccache:/home/ccache
+    image: buildroot-retroroot-build:latest
+    container_name:  buildroot-retroroot-build
+volumes:
+  buildroot-retroroot-build-ccache:

@@ -1,0 +1,11 @@
+[Unit]
+Description=retroarch
+After=syslog.target network.target
+RequiresMountsFor=/data
+
+[Service]
+ExecStart=/bin/retroarch -c /data/retroarch/config/retroarch.cfg
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target

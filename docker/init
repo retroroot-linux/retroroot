@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+set -e
+
+BUILDROOT_USER=${BUILDROOT_USER:-br-user}
+EXTERNAL_TREES=${EXTERNAL_TREES:-aws}
+BUILDROOT_DIR=${BUILDROOT_DIR:-buildroot}
+BR_DIR="/home/${BUILDROOT_USER}/${BUILDROOT_DIR}"
+
+# Set BR_VERBOSE in docker/env
+MAKE_COMMAND="brmake"
+if [ "${BR_VERBOSE}" == "1" ]; then
+  MAKE_COMMAND="make"
+fi
+
+
+# Automatically loop through the contents of ${EXTERNAL_TREES}/configs and pre-setup
+# the build environments.
+# This ensures the following:
+# 1) The external package directory is passed to the make config_defconfig command.
+# 2) The external packages in ${EXTERNAL_TREES}/package are selected.
+# 3) The external packages are built without a user having to know how to pass the BR2_EXTERNAL command to make.
+#
+# Note: There is no need to check for errors, as `set -e` is set on line 3.
+apply_configs() {
+  cd "${BR_DIR}"
+  for EXTERNAL_TREE in ${EXTERNAL_TREES}; do
+    external_tree_dir="${BR_DIR}/${EXTERNAL_TREE}"
+    external_tree_dir_configs="${external_tree_dir}/configs"
+    output_dir_base="${BR_DIR}/${EXTERNAL_TREE}/output"
+
+    mkdir -p "${output_dir_base}"
+    mkdir -p "${external_tree_dir}/dl"
+    for i in "${external_tree_dir_configs}"/*_defconfig; do
+      export BR2_EXTERNAL=${external_tree_dir}/
+      export BR2_DL_DIR=${external_tree_dir}/dl
+      config_file=$(basename "${i}")
+      build_dir_name=$(basename "${i}" |sed s%"_defconfig"%''%g);
+      build_dir="${output_dir_base}/${build_dir_name}"
+      if [ ! -d "${build_dir}" ]; then
+        # `O=${build_dir}` must come last!
+        echo "######## Applying ${config_file} ########"
+        ${MAKE_COMMAND} "${config_file}" O="${build_dir}"
+      fi
+    done
+  done
+}
+
+
+# Build all config files in each exteranl tree configs directory.
+build_all(){
+  for EXTERNAL_TREE in ${EXTERNAL_TREES}; do
+    output_dir_base="${BR_DIR}/${EXTERNAL_TREE}/output"
+    for i in "${output_dir_base}"/*; do
+      cd "${i}";
+      echo "######## Building ${i} ########"
+      ${MAKE_COMMAND}
+      echo "######## Finished building ${i} ########"
+    done
+  done
+  if [[ "${EXIT_AFTER_BUILD}" == 1 ]]; then
+    exit 0
+  fi
+}
+
+
+# Clean all directories in each exteranl tree build directory.
+clean_all() {
+  for EXTERNAL_TREE in ${EXTERNAL_TREES}; do
+    output_dir_base="${BR_DIR}/${EXTERNAL_TREE}/output"
+    for i in $(find "${output_dir_base}" -maxdepth 1 -type d ! -path "${output_dir_base}"); do
+      if [ -d "${i}" ]; then
+        cd "${i}";
+        echo "######## cleaning ${i} ########"
+        make clean
+        echo "######## Finished cleaning ${i} ########"
+      fi
+    done
+  done
+}
+
+
+# Parse the BUILD_LIST environment variable and build each config in the list.
+build_from_list(){
+  for EXTERNAL_TREE in ${EXTERNAL_TREES}; do
+    output_dir_base="${BR_DIR}/${EXTERNAL_TREE}/output"
+    for i in ${BUILD_LIST}; do
+      if [ -d "${output_dir_base}/${i}" ]; then
+        echo "######## Building ${output_dir_base}/${i} ########"
+        cd "${output_dir_base}/${i}"
+        external_tree_dir="${BR_DIR}/${EXTERNAL_TREE}"
+        export BR2_EXTERNAL=${external_tree_dir}/
+        export BR2_DL_DIR=${external_tree_dir}/dl
+        ${MAKE_COMMAND}
+        echo "######## Finished building ${i} ########"
+      else
+        echo "${output_dir_base}/${i} not found. Skip building"
+      fi
+    done
+  done
+  if [[ "${EXIT_AFTER_BUILD}" == 1 ]]; then
+    exit 0
+  fi
+}
+
+# CLEAN_ALL, BUILD_ALL, and BUILD_LIST are set in the docker/env file.
+main() {
+  if [ "${CLEAN_ALL}" == "1" ]; then
+    clean_all
+  fi
+  apply_configs
+
+  if [ "${BUILD_ALL}" == "1" ]; then
+    build_all
+  fi
+
+  if [ -n "${BUILD_LIST}" ]; then
+    build_from_list
+  fi
+}
+
+main "${@}"
+# This keeps the docker image from exiting.
+exec /bin/bash
+exit 0

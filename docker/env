@@ -1,0 +1,25 @@
+# Specify a buildroot user. This must be without quotes.
+BUILDROOT_USER=br-user
+
+# Specify a buildroot directory. This must be without quotes.
+BUILDROOT_DIR=buildroot
+
+# A space deliminated string of external tree names. This must be without quotes.
+EXTERNAL_TREES=retroroot
+
+# Build verbosely
+# BR_ is appended to verbose to avoid environment conflicts with packages that
+# may use the VERBOSE environment variable.
+BR_VERBOSE=0
+
+# Remove everything in retroroot/output and start fresh.
+CLEAN_ALL=0
+
+# Apply all configs in retroroot/configs and build every single config.
+BUILD_ALL=0
+
+# A space seperated list of configs to build. This must be without quotes.
+# BUILD_LIST=retroroot_x86_64_KMS
+
+# Set to 1 if you wish to exit after building.
+EXIT_AFTER_BUILD=0
