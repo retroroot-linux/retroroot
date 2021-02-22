@@ -1,0 +1,35 @@
+From 9b696e31c9843e96c1a7b0b6562a7c2b01cfd098 Mon Sep 17 00:00:00 2001
+From: Adam Duskett <Aduskett@rivian.com>
+Date: Sun, 21 Feb 2021 17:32:49 -0800
+Subject: [PATCH] allow custom strip command
+
+For cross-compiled environments, the normal strip command does not work due to
+the difference between architectures.
+
+Add the STRIP_CMD environment variable that can be passed to dracut.
+
+Signed-off-by: Adam Duskett <Aduskett@rivian.com>
+---
+ dracut.sh | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/dracut.sh b/dracut.sh
+index 3882e8f..6a5aa06 100755
+--- a/dracut.sh
++++ b/dracut.sh
+@@ -1931,8 +1931,11 @@ if [[ $do_strip = yes ]] ; then
+     # Prefer strip from elfutils for package size
+     declare strip_cmd
+     strip_cmd=$(command -v eu-strip)
+-    [ -z "$strip_cmd" ] && strip_cmd="strip"
+ 
++    [ -z "$strip_cmd" ] && strip_cmd="strip"
++    if [ -n "$STRIP_CMD" ]; then
++      strip_cmd="${STRIP_CMD}"
++    fi
+     for p in $strip_cmd xargs find; do
+         if ! type -P $p >/dev/null; then
+             dinfo "Could not find '$p'. Not stripping the initramfs."
+-- 
+2.25.1
+

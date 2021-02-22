@@ -64,6 +64,8 @@ endif
 # This package uses autoconf, but not automake, so we need to call
 # their special autogen.sh script, and have custom target and staging
 # installation commands.
+# We still need to patch libtool after running the autogen.sh script, or else
+# the make files will attempt to link to the host directories.
 define PLYMOUTH_RUN_AUTOGEN
 	cd $(@D) && PATH=$(BR_PATH) NOCONFIGURE="1" ./autogen.sh
 endef

@@ -1,0 +1,35 @@
+From 665bdc0c91f6d4f33bfd6cd4254c8bb31150eb78 Mon Sep 17 00:00:00 2001
+From: Adam Duskett <Aduskett@rivian.com>
+Date: Sun, 21 Feb 2021 14:35:45 -0800
+Subject: [PATCH] busybox module: add BUSYBOX_LIST variable
+
+When installing the Busybox module, Dracut attempts to execute busybox --list
+to get a list of all installed busybox modules.
+
+Executing a cross-compiled busybox won't work when the binary is a different
+architecture from the host. To fix this issue, allow a user to specify a list
+of Busybox files via the "BUSYBOX_LIST" variable and execute busybox --list
+if the list is empty.
+
+Signed-off-by: Adam Duskett <Aduskett@rivian.com>
+---
+ modules.d/05busybox/module-setup.sh | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/modules.d/05busybox/module-setup.sh b/modules.d/05busybox/module-setup.sh
+index 20b36c1..4f0660e 100755
+--- a/modules.d/05busybox/module-setup.sh
++++ b/modules.d/05busybox/module-setup.sh
+@@ -18,7 +18,8 @@ install() {
+     local _progs=()
+     _busybox=$(find_binary busybox)
+     inst $_busybox /usr/bin/busybox
+-    for _i in $($_busybox --list); do
++    [ -z "$BUSYBOX_LIST" ] && BUSYBOX_LIST=$($_busybox --list)
++    for _i in ${BUSYBOX_LIST}; do
+         [[ ${_i} == busybox ]] && continue
+         _progs+=("${_i}")
+     done
+-- 
+2.25.1
+

@@ -1,0 +1,47 @@
+From 05977a71acd9c1a47fc8cf40d628cfe197259de2 Mon Sep 17 00:00:00 2001
+From: Adam Duskett <Aduskett@rivian.com>
+Date: Sun, 21 Feb 2021 17:13:15 -0800
+Subject: [PATCH] fs/common.mk: add pre-fakeroot script variable
+
+Creating nodes with Dracut causes issues because dracut is building an initramfs
+from a given directory. This causes a condition where Dracut is executed with a
+starting fakeroot path, but must create nodes in another path. Because the two
+paths are different, making nodes will fail.
+
+Create a ROOTFS_DRACUT_PRE_FAKEROOT_HOOKS variable which is executed before
+the traditional fakeroot is executed.
+
+Signed-off-by: Adam Duskett <Aduskett@rivian.com>
+---
+ fs/common.mk | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/fs/common.mk b/fs/common.mk
+index afab7b5..07ee293 100644
+--- a/fs/common.mk
++++ b/fs/common.mk
+@@ -162,6 +162,7 @@ endif
+ 
+ $$(BINARIES_DIR)/$$(ROOTFS_$(2)_FINAL_IMAGE_NAME): ROOTFS=$(2)
+ $$(BINARIES_DIR)/$$(ROOTFS_$(2)_FINAL_IMAGE_NAME): FAKEROOT_SCRIPT=$$(ROOTFS_$(2)_DIR)/fakeroot
++$$(BINARIES_DIR)/$$(ROOTFS_$(2)_FINAL_IMAGE_NAME): PRE_FAKEROOT_SCRIPT=$$(ROOTFS_$(2)_DIR)/pre-fakeroot
+ $$(BINARIES_DIR)/$$(ROOTFS_$(2)_FINAL_IMAGE_NAME): $$(ROOTFS_$(2)_DEPENDENCIES)
+ 	@$$(call MESSAGE,"Generating filesystem image $$(ROOTFS_$(2)_FINAL_IMAGE_NAME)")
+ 	mkdir -p $$(@D)
+@@ -172,6 +173,13 @@ $$(BINARIES_DIR)/$$(ROOTFS_$(2)_FINAL_IMAGE_NAME): $$(ROOTFS_$(2)_DEPENDENCIES)
+ 		$$(BASE_TARGET_DIR)/ \
+ 		$$(TARGET_DIR)
+ 
++	echo '#!/bin/sh' > $$(PRE_FAKEROOT_SCRIPT)
++	echo "set -e" >> $$(PRE_FAKEROOT_SCRIPT)
++	$$(foreach hook,$$(ROOTFS_$(2)_PRE_FAKEROOT_HOOKS),\
++		$$(call PRINTF,$$($$(hook))) >> $$(PRE_FAKEROOT_SCRIPT)$$(sep))
++	chmod a+x $$(PRE_FAKEROOT_SCRIPT)
++	PATH=$$(BR_PATH) $$(PRE_FAKEROOT_SCRIPT)
++
+ 	echo '#!/bin/sh' > $$(FAKEROOT_SCRIPT)
+ 	echo "set -e" >> $$(FAKEROOT_SCRIPT)
+ 
+-- 
+2.25.1
+

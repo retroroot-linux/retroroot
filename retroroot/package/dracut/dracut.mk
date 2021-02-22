@@ -8,6 +8,7 @@ DRACUT_VERSION = 052
 DRACUT_SITE = $(call github,dracutdevs,dracut,$(DRACUT_VERSION))
 DRACUT_LICENSE = GPL-2.0
 DRACUT_LICENSE_FILES = COPYING
+DRACUT_INSTALL_STAGING = YES
 
 # Dracut requires realpath from coreutils
 HOST_DRACUT_DEPENDENCIES += \

@@ -112,8 +112,7 @@ RUN set -e; \
   mkdir -p /tmp/patches; \
   for EXTERNAL_TREE in ${EXTERNAL_TREES}; do \
     ln -sf /mnt/${EXTERNAL_TREE} ${EXTERNAL_TREE}; \
-  done; \
-  ln -sf /mnt/${EXTERNAL_TREE}/fs/dracut fs/dracut;
+  done;
 
 # Ensure that any patches held in ${external_trees}/patches/buildroot are applied.
 # This ensures that relevant upstream patches cherry-picked from
