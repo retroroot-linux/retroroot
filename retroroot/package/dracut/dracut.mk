@@ -11,11 +11,11 @@ DRACUT_LICENSE_FILES = COPYING
 DRACUT_INSTALL_STAGING = YES
 
 # Dracut requires realpath from coreutils
+# prelink-cross is used to determin which libraries to copy.
 HOST_DRACUT_DEPENDENCIES += \
 	host-pkgconf \
 	host-kmod \
 	host-coreutils \
-	host-findutils \
 	host-cpio \
 	host-gzip \
 	host-util-linux \
@@ -23,16 +23,12 @@ HOST_DRACUT_DEPENDENCIES += \
 
 DRACUT_DEPENDENCIES += \
 	host-dracut \
-	bash \
-	bash-completion \
-	pkgconf \
 	kmod \
-	bash-completion
+	pkgconf
 
 DRACUT_MAKE_ENV += \
 	CC="$(TARGET_CC)" \
 	PKG_CONFIG="$(HOST_PKG_CONFIG_PATH)" \
-	SYSTEMCTL=$(HOST_DIR)/usr/bin/systemctl \
 	dracutsysrootdir=$(TARGET_DIR)
 
 DRACUT_CONF_OPTS = --disable-documentation
@@ -47,22 +43,37 @@ HOST_DRACUT_CONF_OPTS = \
 	--bindir=$(HOST_DIR)/bin \
 	--sbindir=$(HOST_DIR)/sbin
 
-ifeq ($(BR2_PACKAGE_SYSTEMD),y)
-DRACUT_DEPENDENCIES += systemd
-DRACUT_CONF_OPTS += --systemdsystemunitdir=/usr/lib/systemd/system
+ifeq ($(BR2_PACKAGE_BASH),y)
+DRACUT_DEPENDENCIES += \
+	bash \
+	bash-completion
 endif
 
-define DRACUT_REMOVE_UNEEDED_FILES
-	$(RM) -r $(TARGET_DIR)/usr/lib/dracut/modules.d/00bootchart
+# gensplash is gentoo specific
+define DRACUT_REMOVE_UNEEDED_MODULES
 	$(RM) -r $(TARGET_DIR)/usr/lib/dracut/modules.d/50gensplash
-	$(RM) -r $(TARGET_DIR)/usr/lib/dracut/modules.d/96securityfs
-	$(RM) -r $(TARGET_DIR)/usr/lib/dracut/modules.d/97masterkey
-	$(RM) -r $(TARGET_DIR)/usr/lib/dracut/modules.d/98integrity
-	# Do not start dracut services normally. Dracut will enable these services
-	# when building an image.
+endef
+DRACUT_TARGET_FINALIZE_HOOKS += DRACUT_REMOVE_UNEEDED_MODULES
+
+define DRACUT_LINUX_CONFIG_FIXUPS
+	$(call KCONFIG_ENABLE_OPT,CONFIG_BLK_DEV_INITRD)
+	$(call KCONFIG_ENABLE_OPT,CONFIG_DEVTMPFS)
+endef
+
+ifeq ($(BR2_PACKAGE_SYSTEMD),y)
+
+DRACUT_MAKE_ENV += \
+	SYSTEMCTL=$(HOST_DIR)/usr/bin/systemctl
+
+DRACUT_DEPENDENCIES += systemd
+DRACUT_CONF_OPTS += --systemdsystemunitdir=/usr/lib/systemd/system
+define DRACUT_REMOVE_SYSTEMD_FILES
+	# Do not start dracut services normally. Dracut will enable the dracut
+	# services during image creation.
 	find $(TARGET_DIR)/etc/systemd/system -name "*dracut*.service" -delete
 endef
-DRACUT_TARGET_FINALIZE_HOOKS += DRACUT_REMOVE_UNEEDED_FILES
+DRACUT_TARGET_FINALIZE_HOOKS += DRACUT_REMOVE_SYSTEMD_FILES
+endif
 
 # Install the dracut-install wrapper which exports the proper LD_LIBRARY_PATH
 # when called.

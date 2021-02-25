@@ -1,0 +1,29 @@
+From 4e5776c4cb230d926bd0e72c86a56a1471919cd9 Mon Sep 17 00:00:00 2001
+From: Adam Duskett <aduskett@rivian.com>
+Date: Wed, 24 Feb 2021 14:11:21 -0800
+Subject: [PATCH] fakeroot fixes
+
+Dracut unsets LD_PRELOAD and LD_LIBRARY_PATH, both of which are used by
+fakeroot. If these are not set, fakeroot doesn't work and mknod fails.
+
+Signed-off-by: Adam Duskett <aduskett@rivian.com>
+---
+ dracut.sh | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/dracut.sh b/dracut.sh
+index 800a676..515bd1b 100755
+--- a/dracut.sh
++++ b/dracut.sh
+@@ -697,8 +697,6 @@ export LC_ALL=C
+ export LANG=C
+ unset LC_MESSAGES
+ unset LC_CTYPE
+-unset LD_LIBRARY_PATH
+-unset LD_PRELOAD
+ unset GREP_OPTIONS
+ 
+ export DRACUT_LOG_LEVEL=warning
+-- 
+2.29.2
+

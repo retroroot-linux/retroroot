@@ -1,8 +1,7 @@
 config BR2_TARGET_ROOTFS_DRACUT
 	bool "dracut initramfs"
+	depends on BR2_USE_MMU # dracut -> fork()
 	depends on !BR2_STATIC_LIBS # dracut -> kmod
-	depends on BR2_PACKAGE_HAS_UDEV # dracut -> runtime
-	depends on BR2_PACKAGE_BASH # dracut -> runtime
 	select BR2_PACKAGE_DRACUT
 	help
 	  Build a initramfs using dracut
@@ -11,19 +10,7 @@ config BR2_TARGET_ROOTFS_DRACUT
 
 if BR2_TARGET_ROOTFS_DRACUT
 
-config BR2_PACKAGE_ROOTFS_KERNEL_MODULES
-	string "Kernel modules to include"
-	help
-	  Space seperated list of kernel modules of which to include
-
-config BR2_PACKAGE_ROOTFS_DRACUT_MODULES
-	string "Additional modules"
-	help
-	  Space seperated list of additional dracut modules of which to
-	  install. A full list of modules can be found in the modules.d
-	  directory of the dracut source code.
-
-config BR2_PACKAGE_ROOTFS_DRACUT_HOST_ONLY
+config BR2_TARGET_ROOTFS_DRACUT_HOST_ONLY
 	bool "Host only build"
 	help
 	  Host-Only mode: Install only what is needed for booting the
@@ -35,27 +22,125 @@ config BR2_PACKAGE_ROOTFS_DRACUT_HOST_ONLY
 	  Select this option if you are building for a specific hardware
 	  platform and not a generic PC.
 
-config BR2_PACKAGE_ROOTFS_DRACUT_MOD_SIG
+if BR2_TARGET_ROOTFS_DRACUT_HOST_ONLY
+
+choice
+	prompt "host-only mode"
+	default BR2_TARGET_ROOTFS_DRACUT_HOST_ONLY_SLOPPY
+	help
+	  Select the host-only mode
+
+config BR2_TARGET_ROOTFS_DRACUT_HOST_ONLY_SLOPPY
+	bool "sloppy"
+	help
+	  Extra drivers and modules will be installed, so minor hardware
+	  change won't make the image unbootable (eg. changed keyboard),
+	  and the image is still portable among similar hosts.
+
+config BR2_TARGET_ROOTFS_DRACUT_HOST_ONLY_STRICT
+	bool "strict"
+	help
+	  Anything not necessary for booting the local host in its
+	  current state will not be included, and modules may do
+	  some extra job to save more space. Minor change of
+	  hardware or environment could make the image unbootable.
+
+endchoice
+
+config BR2_TARGET_ROOTFS_DRACUT_KERNEL_MODULES
+	string "Additional kernel modules to include"
+	help
+	  An optional space seperated list of additional kernel modules
+	  of which to include in the initramfs image.
+
+config BR2_PACKAGE_ROOTFS_CONF_PATH
+	string "conf file path"
+	help
+	  An optional path to a dracut conf file
+
+endif # BR2_TARGET_ROOTFS_DRACUT_HOST_ONLY
+
+config BR2_TARGET_ROOTFS_DRACUT_MODULES
+	string "Additional dracut modules"
+	help
+	  Space seperated list of additional dracut modules of which to
+	  install. A full list of modules can be found in the modules.d
+	  directory of the dracut source code.
+
+config BR2_TARGET_ROOTFS_DRACUT_CUSTOM_KERNEL_CMDLINE
+	string "custom kernel command line arguments"
+	help
+	  Specify custom kernel command line argumets. Leave blank to
+	  use the kernel defaults.
+
+config BR2_TARGET_ROOTFS_DRACUT_MOD_SIG
 	bool "Module signing support"
+	select BR2_PACKAGE_KEYUTILS
 	help
 	  Select this if your kernel modules are signed.
 
-config BR2_PACKAGE_ROOTFS_DRACUT_PLYMOUTH
-	bool "plymouth support"
-	depends on BR2_TOOLCHAIN_HAS_THREADS # plymouth -> dbus
-	depends on BR2_USE_MMU # plymouth -> dbus
-	select BR2_PACKAGE_PLYMOUTH
+choice
+	prompt "Compression method"
+	default BR2_TARGET_ROOTFS_DRACUT_NO_COMPRESSION
+	depends on BR2_TARGET_ROOTFS_DRACUT
 	help
-	  plymouth support
+	  Select compressor for tar archive of the root filesystem
 
-comment "plymouth support needs udev and a toolchain w/ threads, mmu"
-	depends on !BR2_PACKAGE_HAS_UDEV
-	depends on BR2_STATIC_LIBS
+config BR2_TARGET_ROOTFS_DRACUT_NO_COMPRESSION
+	bool "no compression"
+	help
+	  Do not compress the dracut image.
+
+config BR2_TARGET_ROOTFS_DRACUT_GZIP_COMPRESSION
+	bool "gzip"
+	help
+	  Do compress the dracut image with gzip.
+
+config BR2_TARGET_ROOTFS_DRACUT_BZIP2_COMPRESSION
+	bool "bzip2"
+	help
+	  Do compress the dracut image with bzip2.
+
+config BR2_TARGET_ROOTFS_DRACUT_LZ4_COMPRESSION
+	bool "lz4"
+	help
+	  Do compress the dracut image with lz4.
+
+config BR2_TARGET_ROOTFS_DRACUT_LZMA_COMPRESSION
+	bool "lzma"
+	help
+	  Do compress the dracut image with lzma.
+
+config BR2_TARGET_ROOTFS_DRACUT_LZO_COMPRESSION
+	bool "lzo"
+	help
+	  Do compress the dracut image with lzop.
+
+config BR2_TARGET_ROOTFS_DRACUT_XZ_COMPRESSION
+	bool "xz"
+	help
+	  Do compress the dracut image with xz.
+
+config BR2_TARGET_ROOTFS_DRACUT_ZSTD_COMPRESSION
+	bool "zstd"
+	help
+	  Do compress the dracut image with zstd.
+
+endchoice
+
+config BR2_TARGET_ROOTFS_DRACUT_COMPRESSION_METHOD
+	string
+	default "no-compress"  if BR2_TARGET_ROOTFS_DRACUT_NO_COMPRESSION
+	default "gzip"  if BR2_TARGET_ROOTFS_DRACUT_GZIP_COMPRESSION
+	default "bzip2"  if BR2_TARGET_ROOTFS_DRACUT_BZIP2_COMPRESSION
+	default "lz4"  if BR2_TARGET_ROOTFS_DRACUT_LZ4_COMPRESSION
+	default "lzma"  if BR2_TARGET_ROOTFS_DRACUT_LZMA_COMPRESSION
+	default "lzo"  if BR2_TARGET_ROOTFS_DRACUT_LZO_COMPRESSION
+	default "xz"  if BR2_TARGET_ROOTFS_DRACUT_XZ_COMPRESSION
+	default "zstd"  if BR2_TARGET_ROOTFS_DRACUT_ZSTD_COMPRESSION
 
 endif
 
-comment "dracut requires bash"
-	depends on !BR2_PACKAGE_BASH
-
-comment "dracut needs udev and a toolchain w/ dynamic library"
-	depends on !BR2_PACKAGE_HAS_UDEV || BR2_STATIC_LIBS
+comment "dracut needs a toolchain w/ dynamic library"
+	depends on BR2_USE_MMU
+	depends on BR2_STATIC_LIBS

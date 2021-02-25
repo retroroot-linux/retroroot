@@ -9,12 +9,12 @@ ROOTFS_DRACUT_DEPENDENCIES += \
 	host-dracut \
 	dracut
 
-DRACUT_MODULES_INCLUDE = kernel-modules
-DRACUT_MODULES_OMIT = dbus-broker
+ROOTFS_DRACUT_KERNEL_MODULES_INCLUDE = kernel-modules
+ROOTFS_DRACUT_MODULES_OMIT = dbus-broker
 
 # Environment variables used to execute dracut
 # We have to unset "prefix" as dracut uses it to move files around.
-DRACUT_FS_ENV = \
+ROOTFS_DRACUT_FS_ENV = \
 	prefix="" \
 	DESTROOTDIR="$(ROOTFS_DRACUT_DIR)/target" \
 	DRACUT_ARCH=$(BR2_ARCH) \
@@ -26,22 +26,21 @@ DRACUT_FS_ENV = \
 	DRACUT_INSTALL_PATH="$(ROOTFS_DRACUT_DIR)/target/usr/bin:$(ROOTFS_DRACUT_DIR)/target/usr/sbin:$(ROOTFS_DRACUT_DIR)/target/usr/lib" \
 	DRACUT_LDCONFIG=/bin/true \
 	DRACUT_LDD="$(HOST_DIR)/sbin/prelink-rtld --root=$(ROOTFS_DRACUT_DIR)/target/" \
-	DRACUT_PATH="/usr/bin /usr/sbin" \
-	INITRAMFS_VERSION=initramfs-$(LINUX_VERSION_PROBED).img \
-	KERNEL_VERSION=$(LINUX_VERSION_PROBED) \
+	DRACUT_PATH="/bin /sbin" \
 	STRIP_CMD="$(TARGET_CROSS)strip" \
-	udevdir="$(ROOTFS_DRACUT_DIR)/target/usr/lib/udev"
+	udevdir="$(ROOTFS_DRACUT_DIR)/target/usr/lib/udev" \
+	INITRAMFS_VERSION=rootfs.dracut
 
 ifeq ($(BR2_ROOTFS_DEVICE_TABLE_SUPPORTS_EXTENDED_ATTRIBUTES),y)
-DRACUT_FS_ENV += DRACUT_NO_XATTR=true
+ROOTFS_DRACUT_FS_ENV += DRACUT_NO_XATTR=true
 else
-DRACUT_FS_ENV += DRACUT_NO_XATTR=false
+ROOTFS_DRACUT_FS_ENV += DRACUT_NO_XATTR=false
 endif
 
 ifeq ($(BR2_PACKAGE_BASH),y)
-DRACUT_MODULES += bash
+ROOTFS_DRACUT_MODULES_INCLUDE += bash
 else
-DRACUT_MODULES_OMIT += bash
+ROOTFS_DRACUT_MODULES_OMIT += bash
 endif
 
 # Dracut typically executes busybox --list to get a list of installed busybox
@@ -50,105 +49,105 @@ endif
 # the list to Dracut using the busybox.links file that busybox creates when
 # compiling.
 ifeq ($(BR2_PACKAGE_BUSYBOX),y)
-DRACUT_FS_ENV += \
+ROOTFS_DRACUT_FS_ENV += \
 	BUSYBOX_LIST=`sed -r -e s%.*/%%  $(BUSYBOX_DIR)/busybox.links;`
-DRACUT_MODULES += busybox
+ROOTFS_DRACUT_MODULES_INCLUDE += busybox
 else
-DRACUT_MODULES_OMIT += busybox
+ROOTFS_DRACUT_MODULES_OMIT += busybox
 endif
 
 ifeq ($(BR2_PACKAGE_MKSH),y)
-DRACUT_MODULES += mksh
+ROOTFS_DRACUT_MODULES_INCLUDE += mksh
 else
-DRACUT_MODULES_OMIT += mksh
+ROOTFS_DRACUT_MODULES_OMIT += mksh
 endif
 
 ifeq ($(BR2_PACKAGE_BTRFS_PROGS),y)
-DRACUT_MODULES += btrfs
+ROOTFS_DRACUT_MODULES_INCLUDE += btrfs
 else
-DRACUT_MODULES_OMIT += btrfs
+ROOTFS_DRACUT_MODULES_OMIT += btrfs
 endif
 
 ifeq ($(BR2_PACKAGE_DASH),y)
-DRACUT_MODULES += dash
+ROOTFS_DRACUT_MODULES_INCLUDE += dash
 else
-DRACUT_MODULES_OMIT += dash
+ROOTFS_DRACUT_MODULES_OMIT += dash
 endif
 
 ifeq ($(BR2_PACKAGE_PERL_I18N),y)
-DRACUT_MODULES += i18n
+ROOTFS_DRACUT_MODULES_INCLUDE += i18n
 else
-DRACUT_MODULES_OMIT += i18n
+ROOTFS_DRACUT_MODULES_OMIT += i18n
 endif
 
 ifeq ($(BR2_PACKAGE_RNG_TOOLS),y)
-DRACUT_MODULES += rngd
+ROOTFS_DRACUT_MODULES_INCLUDE += rngd
 else
-DRACUT_MODULES_OMIT += rngd
+ROOTFS_DRACUT_MODULES_OMIT += rngd
 endif
 
 ifeq ($(BR2_PACKAGE_LIBSELINUX),y)
-DRACUT_MODULES += securityfs selinux
+ROOTFS_DRACUT_MODULES_INCLUDE += securityfs selinux
 else
-DRACUT_MODULES_OMIT += securityfs selinux
+ROOTFS_DRACUT_MODULES_OMIT += securityfs selinux
 endif
 
 ifeq ($(BR2_PACKAGE_SYSTEMD),y)
 # Dracut doesn't support decimal points for the systemd version.
-DRACUT_SYSTEMD_VERSION_SANATIZED=`echo $(SYSTEMD_VERSION) |cut -d . -f 1`
-DRACUT_FS_ENV += \
+ROOTFS_DRACUT_SYSTEMD_VERSION_SANATIZED=`echo $(SYSTEMD_VERSION) |cut -d . -f 1`
+ROOTFS_DRACUT_FS_ENV += \
 	SYSTEMCTL="$(HOST_DIR)/bin/systemctl" \
-	SYSTEMD_VERSION=$(DRACUT_SYSTEMD_VERSION_SANATIZED) \
-	UDEVVERSION=$(DRACUT_SYSTEMD_VERSION_SANATIZED) \
+	SYSTEMD_VERSION=$(ROOTFS_DRACUT_SYSTEMD_VERSION_SANATIZED) \
+	UDEVVERSION=$(ROOTFS_DRACUT_SYSTEMD_VERSION_SANATIZED) \
 	systemctlpath="$(HOST_DIR)/bin/systemctl" \
 	systemdsystemconfdir="$(ROOTFS_DRACUT_DIR)/target/etc/systemd/system" \
 	systemdsystemunitdir="$(ROOTFS_DRACUT_DIR)/target/lib/systemd/system" \
 	systemdutildir="$(ROOTFS_DRACUT_DIR)/target/lib/systemd"
-DRACUT_MODULES += systemd
+ROOTFS_DRACUT_MODULES_INCLUDE += systemd
 else
-DRACUT_MODULES_OMIT += systemd
+ROOTFS_DRACUT_MODULES_OMIT += systemd
 endif
 
 ifeq ($(BR2_PACKAGE_SYSTEMD_COREDUMP),y)
-DRACUT_MODULES += systemd-coredump
+ROOTFS_DRACUT_MODULES_INCLUDE += systemd-coredump
 else
-DRACUT_MODULES_OMIT += systemd-coredump
+ROOTFS_DRACUT_MODULES_OMIT += systemd-coredump
 endif
 
 ifeq ($(BR2_PACKAGE_SYSTEMD_INITRD),y)
-DRACUT_MODULES += systemd-initrd
+ROOTFS_DRACUT_MODULES_INCLUDE += systemd-initrd
 else
-DRACUT_MODULES_OMIT += systemd-initrd
+ROOTFS_DRACUT_MODULES_OMIT += systemd-initrd
 endif
 
 ifeq ($(BR2_PACKAGE_SYSTEMD_REPART),y)
-DRACUT_MODULES += systemd-repart
+ROOTFS_DRACUT_MODULES_INCLUDE += systemd-repart
 else
-DRACUT_MODULES_OMIT += systemd-repart
+ROOTFS_DRACUT_MODULES_OMIT += systemd-repart
 endif
 
 ifeq ($(BR2_PACKAGE_SYSTEMD_SYSUSERS),y)
-DRACUT_MODULES += systemd-sysusers
+ROOTFS_DRACUT_MODULES_INCLUDE += systemd-sysusers
 else
-DRACUT_MODULES_OMIT += systemd-sysusers
+ROOTFS_DRACUT_MODULES_OMIT += systemd-sysusers
 endif
 
 ifeq ($(BR2_PACKAGE_SYSTEMD_NETWORKD),y)
-DRACUT_MODULES += systemd-networkd
+ROOTFS_DRACUT_MODULES_INCLUDE += systemd-networkd
 else
-DRACUT_MODULES_OMIT += systemd-networkd
+ROOTFS_DRACUT_MODULES_OMIT += systemd-networkd
 endif
 
 ifeq ($(BR2_PACKAGE_UTIL_LINUX_HWCLOCK),y)
-DRACUT_MODULES += warpclock
+ROOTFS_DRACUT_MODULES_INCLUDE += warpclock
 else
-DRACUT_MODULES_OMIT += warpclock
+ROOTFS_DRACUT_MODULES_OMIT += warpclock
 endif
 
-ifeq ($(BR2_PACKAGE_ROOTFS_DRACUT_PLYMOUTH),y)
+ifeq ($(BR2_PACKAGE_PLYMOUTH),y)
 ROOTFS_DRACUT_DEPENDENCIES += plymouth
-DRACUT_MODULES += plymouth
-DRACUT_FS_ENV += \
+ROOTFS_DRACUT_MODULES_INCLUDE += plymouth
+ROOTFS_DRACUT_FS_ENV += \
 	PLYMOUTH_CONFDIR=$(ROOTFS_DRACUT_DIR)/target/etc/plymouth \
 	PLYMOUTH_DATADIR=$(ROOTFS_DRACUT_DIR)/target//usr/share \
 	PLYMOUTH_POLICYDIR=$(ROOTFS_DRACUT_DIR)/target/usr/share/plymouth/ \
@@ -160,56 +159,84 @@ DRACUT_FS_ENV += \
 	PLYMOUTH_THEME_NAME="spinner" \
 	PLYMOUTH_THEME="spinner"
 else
-DRACUT_MODULES_OMIT += plymouth
+ROOTFS_DRACUT_MODULES_OMIT += plymouth
 endif
 
-DRACUT_ROOTFS_BUILTIN_MODULES = $(call qstrip,$(BR2_PACKAGE_ROOTFS_KERNEL_MODULES))
-DRACUT_MODULES += $(call qstrip,$(BR2_PACKAGE_ROOTFS_DRACUT_MODULES))
-DRACUT_MKFS_CONF_OPTS = \
-	--modules="$(DRACUT_MODULES)" \
-	--omit="$(DRACUT_MODULES_OMIT)" \
-	--drivers=$(DRACUT_ROOTFS_BUILTIN_MODULES) \
+ifeq ($(BR2_TARGET_ROOTFS_DRACUT_MOD_SIG),y)
+ROOTFS_DRACUT_DEPENDENCIES += keyutils
+ROOTFS_DRACUT_MODULES_INCLUDE += modsign
+else
+ROOTFS_DRACUT_MODULES_OMIT += modsign
+endif
+
+ROOTFS_DRACUT_KERNEL_MODULES = $(call qstrip,$(BR2_TARGET_ROOTFS_DRACUT_KERNEL_MODULES))
+ROOTFS_DRACUT_MODULES_INCLUDE += $(call qstrip,$(BR2_TARGET_ROOTFS_DRACUT_MODULES))
+ROOTFS_DRACUT_CUSTOM_KERNEL_CMDLINE = $(call qstrip,$(BR2_TARGET_ROOTFS_DRACUT_CUSTOM_KERNEL_CMDLINE))
+ROOTFS_DRACUT_COMPRESSION_METHOD = $(call qstrip,$(BR2_TARGET_ROOTFS_DRACUT_COMPRESSION_METHOD))
+ROOTFS_DRACUT_CONF_PATH = $(call qstrip,$(BR2_TARGET_ROOTFS_DRACUT_CONF_PATH))
+ROOTFS_DRACUT_MKFS_CONF_OPTS = \
+	--modules="$(ROOTFS_DRACUT_MODULES_INCLUDE)" \
+	--omit="$(ROOTFS_DRACUT_MODULES_OMIT)" \
+	--drivers=$(ROOTFS_DRACUT_KERNEL_MODULES) \
+	--$(ROOTFS_DRACUT_COMPRESSION_METHOD) \
 	--force \
 	--fstab \
-	--kernel-image="$(BINARIES_DIR)/$(LINUX_TARGET_NAME)" \
-	--kmoddir="$(ROOTFS_DRACUT_DIR)/target/lib/modules/$(LINUX_VERSION_PROBED)" \
-	--no-compress \
+	--no-kernel \
 	--noprefix \
-	--fakeroot=$(HOST_DIR)/bin/fakeroot \
-	--sysroot="$(ROOTFS_DRACUT_DIR)/target" \
+	--sysroot=$(ROOTFS_DRACUT_DIR)/target \
 	--tmpdir=$(ROOTFS_DRACUT_DIR)/rootfs.dracut.tmp \
 	--verbose
 
-ifeq ($(BR2_PACKAGE_ROOTFS_DRACUT_HOST_ONLY),y)
-DRACUT_MKFS_CONF_OPTS += --hostonly
-else
-DRACUT_MKFS_CONF_OPTS += --no-hostonly
+ifneq ($(ROOTFS_DRACUT_CONF_PATH),)
+ROOTFS_DRACUT_MKFS_CONF_OPTS += --conf=$(ROOTFS_DRACUT_CONF_PATH)
 endif
 
-ifeq ($(BR2_PACKAGE_ROOTFS_DRACUT_MOD_SIG),y)
-DRACUT_MODULES += modsign
+ifneq ($(ROOTFS_DRACUT_CUSTOM_KERNEL_CMDLINE),)
+ROOTFS_DRACUT_MKFS_CONF_OPTS += --kernel-cmdline=$(ROOTFS_DRACUT_CUSTOM_KERNEL_CMDLINE)
+endif
+
+ifeq ($(BR2_LINUX_KERNEL),y)
+ROOTFS_DRACUT_KERNEL_IMAGE_PATH=$(BINARIES_DIR)/$(LINUX_TARGET_NAME)
+ROOTFS_DRACUT_KERNEL_VERSION=$(LINUX_VERSION_PROBED)
+
+ROOTFS_DRACUT_MKFS_CONF_OPTS += \
+	--kver=$(ROOTFS_DRACUT_KERNEL_VERSION) \
+	--kernel-image=$(ROOTFS_DRACUT_KERNEL_IMAGE_PATH) \
+	--kmoddir="$(ROOTFS_DRACUT_DIR)/target/lib/modules/$(ROOTFS_DRACUT_KERNEL_VERSION)"
+
+ROOTFS_DRACUT_FS_ENV += KERNEL_VERSION=$(ROOTFS_DRACUT_KERNEL_VERSION)
+endif
+
+ifeq ($(BR2_TARGET_ROOTFS_DRACUT_HOST_ONLY),y)
+ROOTFS_DRACUT_MKFS_CONF_OPTS += --hostonly
+ROOTFS_DRACUT_MKFS_CONF_OPTS += --no-hostonly-cmdline
+ifeq ($(BR2_TARGET_ROOTFS_DRACUT_HOST_ONLY_SLOPPY),y)
+ROOTFS_DRACUT_MKFS_CONF_OPTS += --hostonly-mode=sloppy
 else
-DRACUT_MODULES_OMIT += modsign
+ROOTFS_DRACUT_MKFS_CONF_OPTS += --hostonly-mode=strict
+endif
+else
+ROOTFS_DRACUT_MKFS_CONF_OPTS += --no-hostonly
 endif
 
 ifeq ($(BR2_STRIP_strip),y)
-DRACUT_MKFS_CONF_OPTS += --strip
+ROOTFS_DRACUT_MKFS_CONF_OPTS += --strip
 else
-DRACUT_MKFS_CONF_OPTS += --nostrip
+ROOTFS_DRACUT_MKFS_CONF_OPTS += --nostrip
 endif
 
 ifeq ($(BR2_REPRODUCIBLE),y)
-DRACUT_MKFS_CONF_OPTS += --reproducible
+ROOTFS_DRACUT_MKFS_CONF_OPTS += --reproducible
+else
+ROOTFS_DRACUT_MKFS_CONF_OPTS += --no-reproducible
 endif
 
-define ROOTFS_DRACUT_BUILD
+define ROOTFS_DRACUT_CMD
 	(mkdir -p $(ROOTFS_DRACUT_DIR)/rootfs.dracut.tmp && \
-		$(DRACUT_FS_ENV) \
+		$(ROOTFS_DRACUT_FS_ENV) \
 		$(HOST_DIR)/bin/dracut \
-		$(DRACUT_MKFS_CONF_OPTS) \
-		$(BINARIES_DIR)/initramfs-$(LINUX_VERSION_PROBED).img \
-		$(LINUX_VERSION_PROBED))
+		$(ROOTFS_DRACUT_MKFS_CONF_OPTS) \
+		$(BINARIES_DIR)/rootfs.cpio)
 endef
-ROOTFS_DRACUT_PRE_FAKEROOT_HOOKS += ROOTFS_DRACUT_BUILD
 
 $(eval $(rootfs))
