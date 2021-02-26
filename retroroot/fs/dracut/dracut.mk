@@ -9,11 +9,20 @@ ROOTFS_DRACUT_DEPENDENCIES += \
 	host-dracut \
 	dracut
 
-ROOTFS_DRACUT_KERNEL_MODULES_INCLUDE = kernel-modules
+ROOTFS_DRACUT_MODULES_INCLUDE = \
+	base \
+	dbus \
+	rootfs-block \
+	systemd \
+	systemd-initrd \
+	dracut-systemd \
+	udev-rules
 ROOTFS_DRACUT_MODULES_OMIT = dbus-broker
 
 # Environment variables used to execute dracut
 # We have to unset "prefix" as dracut uses it to move files around.
+# Dracut doesn't support decimal points for the systemd version.
+ROOTFS_DRACUT_SYSTEMD_VERSION_SANATIZED=`echo $(SYSTEMD_VERSION) |cut -d . -f 1`
 ROOTFS_DRACUT_FS_ENV = \
 	prefix="" \
 	DESTROOTDIR="$(ROOTFS_DRACUT_DIR)/target" \
@@ -28,8 +37,22 @@ ROOTFS_DRACUT_FS_ENV = \
 	DRACUT_LDD="$(HOST_DIR)/sbin/prelink-rtld --root=$(ROOTFS_DRACUT_DIR)/target/" \
 	DRACUT_PATH="/bin /sbin" \
 	STRIP_CMD="$(TARGET_CROSS)strip" \
-	udevdir="$(ROOTFS_DRACUT_DIR)/target/usr/lib/udev" \
-	INITRAMFS_VERSION=rootfs.dracut
+	SYSTEMCTL="$(HOST_DIR)/bin/systemctl" \
+	SYSTEMD_VERSION=$(ROOTFS_DRACUT_SYSTEMD_VERSION_SANATIZED) \
+	UDEVVERSION=$(ROOTFS_DRACUT_SYSTEMD_VERSION_SANATIZED) \
+	systemctlpath="$(HOST_DIR)/bin/systemctl" \
+	systemdsystemconfdir="$(ROOTFS_DRACUT_DIR)/target/etc/systemd/system" \
+	systemdsystemunitdir="$(ROOTFS_DRACUT_DIR)/target/lib/systemd/system" \
+	systemdutildir="$(ROOTFS_DRACUT_DIR)/target/lib/systemd/" \
+	udevdir="$(ROOTFS_DRACUT_DIR)/target/usr/lib/udev"
+
+ROOTFS_DRACUT_MKFS_CONF_OPTS = \
+	--force \
+	--fstab \
+	--noprefix \
+	--sysroot=$(ROOTFS_DRACUT_DIR)/target \
+	--tmpdir=$(ROOTFS_DRACUT_DIR)/rootfs.dracut.tmp \
+	--verbose
 
 ifeq ($(BR2_ROOTFS_DEVICE_TABLE_SUPPORTS_EXTENDED_ATTRIBUTES),y)
 ROOTFS_DRACUT_FS_ENV += DRACUT_NO_XATTR=true
@@ -48,7 +71,7 @@ endif
 # cross-compiled environment. To avoid using a qemu-wrapper, we manually pass
 # the list to Dracut using the busybox.links file that busybox creates when
 # compiling.
-ifeq ($(BR2_PACKAGE_BUSYBOX),y)
+ifeq ($(BR2_PACKAGE_BUSYBOX)$(BR2_PACKAGE_BUSYBOX_INDIVIDUAL_BINARIES),y)
 ROOTFS_DRACUT_FS_ENV += \
 	BUSYBOX_LIST=`sed -r -e s%.*/%%  $(BUSYBOX_DIR)/busybox.links;`
 ROOTFS_DRACUT_MODULES_INCLUDE += busybox
@@ -90,34 +113,6 @@ ifeq ($(BR2_PACKAGE_LIBSELINUX),y)
 ROOTFS_DRACUT_MODULES_INCLUDE += securityfs selinux
 else
 ROOTFS_DRACUT_MODULES_OMIT += securityfs selinux
-endif
-
-ifeq ($(BR2_PACKAGE_SYSTEMD),y)
-# Dracut doesn't support decimal points for the systemd version.
-ROOTFS_DRACUT_SYSTEMD_VERSION_SANATIZED=`echo $(SYSTEMD_VERSION) |cut -d . -f 1`
-ROOTFS_DRACUT_FS_ENV += \
-	SYSTEMCTL="$(HOST_DIR)/bin/systemctl" \
-	SYSTEMD_VERSION=$(ROOTFS_DRACUT_SYSTEMD_VERSION_SANATIZED) \
-	UDEVVERSION=$(ROOTFS_DRACUT_SYSTEMD_VERSION_SANATIZED) \
-	systemctlpath="$(HOST_DIR)/bin/systemctl" \
-	systemdsystemconfdir="$(ROOTFS_DRACUT_DIR)/target/etc/systemd/system" \
-	systemdsystemunitdir="$(ROOTFS_DRACUT_DIR)/target/lib/systemd/system" \
-	systemdutildir="$(ROOTFS_DRACUT_DIR)/target/lib/systemd"
-ROOTFS_DRACUT_MODULES_INCLUDE += systemd
-else
-ROOTFS_DRACUT_MODULES_OMIT += systemd
-endif
-
-ifeq ($(BR2_PACKAGE_SYSTEMD_COREDUMP),y)
-ROOTFS_DRACUT_MODULES_INCLUDE += systemd-coredump
-else
-ROOTFS_DRACUT_MODULES_OMIT += systemd-coredump
-endif
-
-ifeq ($(BR2_PACKAGE_SYSTEMD_INITRD),y)
-ROOTFS_DRACUT_MODULES_INCLUDE += systemd-initrd
-else
-ROOTFS_DRACUT_MODULES_OMIT += systemd-initrd
 endif
 
 ifeq ($(BR2_PACKAGE_SYSTEMD_REPART),y)
@@ -174,18 +169,11 @@ ROOTFS_DRACUT_MODULES_INCLUDE += $(call qstrip,$(BR2_TARGET_ROOTFS_DRACUT_MODULE
 ROOTFS_DRACUT_CUSTOM_KERNEL_CMDLINE = $(call qstrip,$(BR2_TARGET_ROOTFS_DRACUT_CUSTOM_KERNEL_CMDLINE))
 ROOTFS_DRACUT_COMPRESSION_METHOD = $(call qstrip,$(BR2_TARGET_ROOTFS_DRACUT_COMPRESSION_METHOD))
 ROOTFS_DRACUT_CONF_PATH = $(call qstrip,$(BR2_TARGET_ROOTFS_DRACUT_CONF_PATH))
-ROOTFS_DRACUT_MKFS_CONF_OPTS = \
+ROOTFS_DRACUT_MKFS_CONF_OPTS += \
 	--modules="$(ROOTFS_DRACUT_MODULES_INCLUDE)" \
 	--omit="$(ROOTFS_DRACUT_MODULES_OMIT)" \
 	--drivers=$(ROOTFS_DRACUT_KERNEL_MODULES) \
-	--$(ROOTFS_DRACUT_COMPRESSION_METHOD) \
-	--force \
-	--fstab \
-	--no-kernel \
-	--noprefix \
-	--sysroot=$(ROOTFS_DRACUT_DIR)/target \
-	--tmpdir=$(ROOTFS_DRACUT_DIR)/rootfs.dracut.tmp \
-	--verbose
+	--$(ROOTFS_DRACUT_COMPRESSION_METHOD)
 
 ifneq ($(ROOTFS_DRACUT_CONF_PATH),)
 ROOTFS_DRACUT_MKFS_CONF_OPTS += --conf=$(ROOTFS_DRACUT_CONF_PATH)
@@ -205,6 +193,7 @@ ROOTFS_DRACUT_MKFS_CONF_OPTS += \
 	--kmoddir="$(ROOTFS_DRACUT_DIR)/target/lib/modules/$(ROOTFS_DRACUT_KERNEL_VERSION)"
 
 ROOTFS_DRACUT_FS_ENV += KERNEL_VERSION=$(ROOTFS_DRACUT_KERNEL_VERSION)
+ROOTFS_DRACUT_MODULES_INCLUDE += kernel-modules
 endif
 
 ifeq ($(BR2_TARGET_ROOTFS_DRACUT_HOST_ONLY),y)

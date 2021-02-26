@@ -2,6 +2,7 @@ config BR2_TARGET_ROOTFS_DRACUT
 	bool "dracut initramfs"
 	depends on BR2_USE_MMU # dracut -> fork()
 	depends on !BR2_STATIC_LIBS # dracut -> kmod
+	depends on BR2_PACKAGE_SYSTEMD
 	select BR2_PACKAGE_DRACUT
 	help
 	  Build a initramfs using dracut
@@ -53,12 +54,12 @@ config BR2_TARGET_ROOTFS_DRACUT_KERNEL_MODULES
 	  An optional space seperated list of additional kernel modules
 	  of which to include in the initramfs image.
 
+endif # BR2_TARGET_ROOTFS_DRACUT_HOST_ONLY
+
 config BR2_PACKAGE_ROOTFS_CONF_PATH
 	string "conf file path"
 	help
 	  An optional path to a dracut conf file
-
-endif # BR2_TARGET_ROOTFS_DRACUT_HOST_ONLY
 
 config BR2_TARGET_ROOTFS_DRACUT_MODULES
 	string "Additional dracut modules"
@@ -140,6 +141,9 @@ config BR2_TARGET_ROOTFS_DRACUT_COMPRESSION_METHOD
 	default "zstd"  if BR2_TARGET_ROOTFS_DRACUT_ZSTD_COMPRESSION
 
 endif
+
+comment "dracut needs systemd"
+	depends on !BR2_PACKAGE_SYSTEMD
 
 comment "dracut needs a toolchain w/ dynamic library"
 	depends on BR2_USE_MMU

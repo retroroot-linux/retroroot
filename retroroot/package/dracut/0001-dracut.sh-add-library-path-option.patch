@@ -43,7 +43,7 @@ index df72d9c..885c921 100755
          --mount)       fstab_lines+=("$2");                   PARMS_TO_STORE+=" '$2'"; shift;;
          --add-device|--device) add_device_l+=("$2");          PARMS_TO_STORE+=" '$2'"; shift;;
          --kernel-cmdline) kernel_cmdline_l+=("$2");           PARMS_TO_STORE+=" '$2'"; shift;;
-@@ -1057,6 +1060,9 @@ fi
+@@ -1056,6 +1059,9 @@ fi
  
  if ! [[ $print_cmdline ]]; then
      inst "$DRACUT_TESTBIN"

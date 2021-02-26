@@ -17,7 +17,7 @@ diff --git a/dracut.sh b/dracut.sh
 index 3882e8f..6a5aa06 100755
 --- a/dracut.sh
 +++ b/dracut.sh
-@@ -1931,8 +1931,11 @@ if [[ $do_strip = yes ]] ; then
+@@ -1921,8 +1921,11 @@ if [[ $do_strip = yes ]] ; then
      # Prefer strip from elfutils for package size
      declare strip_cmd
      strip_cmd=$(command -v eu-strip)

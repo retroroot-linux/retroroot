@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-DRACUT_VERSION = 052
+DRACUT_VERSION = 053
 DRACUT_SITE = $(call github,dracutdevs,dracut,$(DRACUT_VERSION))
 DRACUT_LICENSE = GPL-2.0
 DRACUT_LICENSE_FILES = COPYING
@@ -24,14 +24,19 @@ HOST_DRACUT_DEPENDENCIES += \
 DRACUT_DEPENDENCIES += \
 	host-dracut \
 	kmod \
-	pkgconf
+	pkgconf \
+	systemd \
+	util-linux
 
 DRACUT_MAKE_ENV += \
 	CC="$(TARGET_CC)" \
 	PKG_CONFIG="$(HOST_PKG_CONFIG_PATH)" \
-	dracutsysrootdir=$(TARGET_DIR)
+	SYSTEMCTL=$(HOST_DIR)/usr/bin/systemctl \
+	dracutsysrootdir=$(TARGET_DIR) \
 
-DRACUT_CONF_OPTS = --disable-documentation
+DRACUT_CONF_OPTS = \
+	--disable-documentation \
+	--systemdsystemunitdir=/usr/lib/systemd/system
 
 HOST_DRACUT_MAKE_ENV += \
 	PKG_CONFIG="$(HOST_PKG_CONFIG_PATH)"
@@ -60,20 +65,12 @@ define DRACUT_LINUX_CONFIG_FIXUPS
 	$(call KCONFIG_ENABLE_OPT,CONFIG_DEVTMPFS)
 endef
 
-ifeq ($(BR2_PACKAGE_SYSTEMD),y)
-
-DRACUT_MAKE_ENV += \
-	SYSTEMCTL=$(HOST_DIR)/usr/bin/systemctl
-
-DRACUT_DEPENDENCIES += systemd
-DRACUT_CONF_OPTS += --systemdsystemunitdir=/usr/lib/systemd/system
 define DRACUT_REMOVE_SYSTEMD_FILES
 	# Do not start dracut services normally. Dracut will enable the dracut
 	# services during image creation.
 	find $(TARGET_DIR)/etc/systemd/system -name "*dracut*.service" -delete
 endef
 DRACUT_TARGET_FINALIZE_HOOKS += DRACUT_REMOVE_SYSTEMD_FILES
-endif
 
 # Install the dracut-install wrapper which exports the proper LD_LIBRARY_PATH
 # when called.

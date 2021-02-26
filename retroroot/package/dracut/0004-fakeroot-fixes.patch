@@ -15,7 +15,7 @@ diff --git a/dracut.sh b/dracut.sh
 index 800a676..515bd1b 100755
 --- a/dracut.sh
 +++ b/dracut.sh
-@@ -697,8 +697,6 @@ export LC_ALL=C
+@@ -698,8 +698,6 @@ export LC_ALL=C
  export LANG=C
  unset LC_MESSAGES
  unset LC_CTYPE

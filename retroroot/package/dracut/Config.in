@@ -2,9 +2,13 @@ config BR2_PACKAGE_DRACUT
 	bool "dracut"
 	depends on BR2_USE_MMU # fork()
 	depends on !BR2_STATIC_LIBS # kmod
+	depends on BR2_PACKAGE_SYSTEMD
 	select BR2_PACKAGE_KMOD
 	select BR2_PACKAGE_PKGCONF
 	select BR2_PACKAGE_BASH_COMPLETION if BR2_PACKAGE_BASH
+	select BR2_PACKAGE_SYSTEMD_INITRD # runtime
+	select BR2_PACKAGE_UTIL_LINUX # runtime
+	select BR2_PACKAGE_UTIL_LINUX_SULOGIN # runtime
 	help
 	  dracut (the tool) is used to create an initramfs image by
 	  copying tools and files from an installed system and combining
@@ -12,6 +16,9 @@ config BR2_PACKAGE_DRACUT
 	  /usr/lib/dracut/modules.d.
 
 	  https://github.com/dracutdevs/dracut
+
+comment "dracut needs systemd"
+	depends on !BR2_PACKAGE_SYSTEMD
 
 comment "dracut needs a toolchain w/ dynamic library"
 	depends on BR2_USE_MMU
