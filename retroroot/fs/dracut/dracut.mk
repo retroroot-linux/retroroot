@@ -23,34 +23,35 @@ ROOTFS_DRACUT_MODULES_OMIT = dbus-broker
 # We have to unset "prefix" as dracut uses it to move files around.
 # Dracut doesn't support decimal points for the systemd version.
 ROOTFS_DRACUT_SYSTEMD_VERSION_SANATIZED=`echo $(SYSTEMD_VERSION) |cut -d . -f 1`
+ROOTFS_DRACUT_TARGET_DIR="$(ROOTFS_DRACUT_DIR)/target
 ROOTFS_DRACUT_FS_ENV = \
 	prefix="" \
-	DESTROOTDIR="$(ROOTFS_DRACUT_DIR)/target" \
+	DESTROOTDIR="$(ROOTFS_DRACUT_TARGET_DIR)" \
 	DRACUT_ARCH=$(BR2_ARCH) \
 	DRACUT_COMPRESS_BZIP2="$(HOST_DIR)/bin/bzip2" \
 	DRACUT_COMPRESS_GZIP="$(HOST_DIR)/bin/gzip" \
 	DRACUT_COMPRESS_LZMA="$(HOST_DIR)/bin/lzma" \
-	DRACUT_FIRMWARE_PATH="$(ROOTFS_DRACUT_DIR)/target/usr/lib/firmware" \
+	DRACUT_FIRMWARE_PATH="$(ROOTFS_DRACUT_TARGET_DIR)/usr/lib/firmware" \
 	DRACUT_INSTALL="$(HOST_DIR)/bin/dracut-install" \
-	DRACUT_INSTALL_PATH="$(ROOTFS_DRACUT_DIR)/target/usr/bin:$(ROOTFS_DRACUT_DIR)/target/usr/sbin:$(ROOTFS_DRACUT_DIR)/target/usr/lib" \
+	DRACUT_INSTALL_PATH="$(ROOTFS_DRACUT_TARGET_DIR)/usr/bin:$(ROOTFS_DRACUT_TARGET_DIR)/usr/sbin:$(ROOTFS_DRACUT_TARGET_DIR)/usr/lib" \
 	DRACUT_LDCONFIG=/bin/true \
-	DRACUT_LDD="$(HOST_DIR)/sbin/prelink-rtld --root=$(ROOTFS_DRACUT_DIR)/target/" \
+	DRACUT_LDD="$(HOST_DIR)/sbin/prelink-rtld --root=$(ROOTFS_DRACUT_TARGET_DIR)/" \
 	DRACUT_PATH="/bin /sbin" \
 	STRIP_CMD="$(TARGET_CROSS)strip" \
 	SYSTEMCTL="$(HOST_DIR)/bin/systemctl" \
-	SYSTEMD_VERSION=$(ROOTFS_DRACUT_SYSTEMD_VERSION_SANATIZED) \
-	UDEVVERSION=$(ROOTFS_DRACUT_SYSTEMD_VERSION_SANATIZED) \
 	systemctlpath="$(HOST_DIR)/bin/systemctl" \
-	systemdsystemconfdir="$(ROOTFS_DRACUT_DIR)/target/etc/systemd/system" \
-	systemdsystemunitdir="$(ROOTFS_DRACUT_DIR)/target/lib/systemd/system" \
-	systemdutildir="$(ROOTFS_DRACUT_DIR)/target/lib/systemd/" \
-	udevdir="$(ROOTFS_DRACUT_DIR)/target/usr/lib/udev"
+	systemdsystemconfdir="$(ROOTFS_DRACUT_TARGET_DIR)/etc/systemd/system" \
+	systemdsystemunitdir="$(ROOTFS_DRACUT_TARGET_DIR)/lib/systemd/system" \
+	systemdutildir="$(ROOTFS_DRACUT_TARGET_DIR)/lib/systemd/" \
+	SYSTEMD_VERSION=$(ROOTFS_DRACUT_SYSTEMD_VERSION_SANATIZED) \
+	udevdir="$(ROOTFS_DRACUT_TARGET_DIR)/usr/lib/udev" \
+	UDEVVERSION=$(ROOTFS_DRACUT_SYSTEMD_VERSION_SANATIZED)
 
 ROOTFS_DRACUT_MKFS_CONF_OPTS = \
 	--force \
 	--fstab \
 	--noprefix \
-	--sysroot=$(ROOTFS_DRACUT_DIR)/target \
+	--sysroot=$(ROOTFS_DRACUT_TARGET_DIR) \
 	--tmpdir=$(ROOTFS_DRACUT_DIR)/rootfs.dracut.tmp \
 	--verbose
 
@@ -143,14 +144,14 @@ ifeq ($(BR2_PACKAGE_PLYMOUTH),y)
 ROOTFS_DRACUT_DEPENDENCIES += plymouth
 ROOTFS_DRACUT_MODULES_INCLUDE += plymouth
 ROOTFS_DRACUT_FS_ENV += \
-	PLYMOUTH_CONFDIR=$(ROOTFS_DRACUT_DIR)/target/etc/plymouth \
-	PLYMOUTH_DATADIR=$(ROOTFS_DRACUT_DIR)/target//usr/share \
-	PLYMOUTH_POLICYDIR=$(ROOTFS_DRACUT_DIR)/target/usr/share/plymouth/ \
-	PLYMOUTH_LOGO_FILE=$(ROOTFS_DRACUT_DIR)/target/etc/plymouth/bizcom.png \
-	PLYMOUTH_LIBEXECDIR=$(ROOTFS_DRACUT_DIR)/target/usr/libexec \
-	PLYMOUTH_LDD="$(HOST_DIR)/sbin/prelink-rtld --root=$(ROOTFS_DRACUT_DIR)/target/" \
+	PLYMOUTH_CONFDIR=$(ROOTFS_DRACUT_TARGET_DIR)/etc/plymouth \
+	PLYMOUTH_DATADIR=$(ROOTFS_DRACUT_TARGET_DIR)//usr/share \
+	PLYMOUTH_POLICYDIR=$(ROOTFS_DRACUT_TARGET_DIR)/usr/share/plymouth/ \
+	PLYMOUTH_LOGO_FILE=$(ROOTFS_DRACUT_TARGET_DIR)/etc/plymouth/bizcom.png \
+	PLYMOUTH_LIBEXECDIR=$(ROOTFS_DRACUT_TARGET_DIR)/usr/libexec \
+	PLYMOUTH_LDD="$(HOST_DIR)/sbin/prelink-rtld --root=$(ROOTFS_DRACUT_TARGET_DIR)/" \
 	PLYMOUTH_LDD_PATH=/bin/true \
-	PLYMOUTH_PLUGIN_PATH=$(ROOTFS_DRACUT_DIR)/target/usr/lib/plymouth \
+	PLYMOUTH_PLUGIN_PATH=$(ROOTFS_DRACUT_TARGET_DIR)/usr/lib/plymouth \
 	PLYMOUTH_THEME_NAME="spinner" \
 	PLYMOUTH_THEME="spinner"
 else
@@ -190,7 +191,7 @@ ROOTFS_DRACUT_KERNEL_VERSION=$(LINUX_VERSION_PROBED)
 ROOTFS_DRACUT_MKFS_CONF_OPTS += \
 	--kver=$(ROOTFS_DRACUT_KERNEL_VERSION) \
 	--kernel-image=$(ROOTFS_DRACUT_KERNEL_IMAGE_PATH) \
-	--kmoddir="$(ROOTFS_DRACUT_DIR)/target/lib/modules/$(ROOTFS_DRACUT_KERNEL_VERSION)"
+	--kmoddir="$(ROOTFS_DRACUT_TARGET_DIR)/lib/modules/$(ROOTFS_DRACUT_KERNEL_VERSION)"
 
 ROOTFS_DRACUT_FS_ENV += KERNEL_VERSION=$(ROOTFS_DRACUT_KERNEL_VERSION)
 ROOTFS_DRACUT_MODULES_INCLUDE += kernel-modules

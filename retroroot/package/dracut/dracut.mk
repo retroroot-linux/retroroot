@@ -32,7 +32,7 @@ DRACUT_MAKE_ENV += \
 	CC="$(TARGET_CC)" \
 	PKG_CONFIG="$(HOST_PKG_CONFIG_PATH)" \
 	SYSTEMCTL=$(HOST_DIR)/usr/bin/systemctl \
-	dracutsysrootdir=$(TARGET_DIR) \
+	dracutsysrootdir=$(TARGET_DIR)
 
 DRACUT_CONF_OPTS = \
 	--disable-documentation \
