@@ -8,12 +8,14 @@ PLYMOUTH_VERSION = 0.9.5
 PLYMOUTH_SITE = $(call github,freedesktop,plymouth,$(PLYMOUTH_VERSION))
 PLYMOUTH_LICENSE = GPL-2.0
 PLYMOUTH_LICENSE_FILES = COPYING
+PLYMOUTH_AUTORECONF = YES
 PLYMOUTH_DEPENDENCIES = \
-	libcap \
-	libpng \
 	cairo \
 	dbus \
-	udev
+	libcap \
+	libpng \
+	ncurses \
+	systemd
 
 ifeq ($(call qstrip,$(BR2_PACKAGE_PLYMOUTH_BOOT_LOGO)),)
 PLYMOUTH_BOOT_LOGO=/etc/plymouth/bizcom.png
@@ -22,16 +24,13 @@ PLYMOUTH_BOOT_LOGO=$(call qstrip,$(BR2_PACKAGE_PLYMOUTH_BOOT_LOGO))
 endif
 
 PLYMOUTH_CONF_OPTS = \
+	--enable-systemd-integration \
+	--enable-upstart-monitoring \
 	--with-logo=$(PLYMOUTH_BOOT_LOGO) \
 	--with-background-start-color-stop=0x0073B3 \
 	--with-background-end-color-stop=0x00457E \
-	--with-background-color=0x3391cd
-
-ifeq ($(BR2_ROOTFS_MERGED_USR),y)
-PLYMOUTH_CONF_OPTS += --with-system-root-install
-else
-PLYMOUTH_CONF_OPTS += --without-system-root-install
-endif
+	--with-background-color=0x3391cd \
+	--with-system-root-install
 
 ifeq ($(BR2_PACKAGE_LIBDRM),y)
 PLYMOUTH_DEPENDENCIES += libdrm
@@ -54,20 +53,12 @@ else
 PLYMOUTH_CONF_OPTS += --disable-pango
 endif
 
-ifeq ($(BR2_PACKAGE_SYSTEMD),y)
-PLYMOUTH_DEPENDENCIES += systemd
-PLYMOUTH_CONF_OPTS += --enable-systemd-integration
-else
-PLYMOUTH_CONF_OPTS += --disable-systemd-integration
-endif
-
 # This package uses autoconf, but not automake, so we need to call
-# their special autogen.sh script, and have custom target and staging
-# installation commands.
+# their special autogen.sh script.
 # We still need to patch libtool after running the autogen.sh script, or else
-# the make files will attempt to link to the host directories.
+# the make files will attempt to link to the host PC's directories.
 define PLYMOUTH_RUN_AUTOGEN
-	cd $(@D) && PATH=$(BR_PATH) NOCONFIGURE="1" ./autogen.sh
+	cd $(@D) && PATH=$(BR_PATH) AUTOCONF="$(AUTOCONF)" NOCONFIGURE=1 ./autogen.sh
 endef
 PLYMOUTH_PRE_CONFIGURE_HOOKS += PLYMOUTH_RUN_AUTOGEN
 PLYMOUTH_PRE_CONFIGURE_HOOKS += LIBTOOL_PATCH_HOOK

@@ -1,0 +1,28 @@
+From 105340a2de781139caddc2207363338139263de9 Mon Sep 17 00:00:00 2001
+From: Adam Duskett <Aduskett@gmail.com>
+Date: Sat, 27 Feb 2021 13:54:17 -0800
+Subject: [PATCH] autogen: remove symlink flag
+
+Using symlinks breaks the ldconfig autopatching
+
+Signed-off-by: Adam Duskett <Aduskett@gmail.com>
+---
+ autogen.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/autogen.sh b/autogen.sh
+index a9bf688..b2a1e5b 100755
+--- a/autogen.sh
++++ b/autogen.sh
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ 
+ cd $(dirname $0)
+-autoreconf --install --symlink -Wno-portability
++autoreconf --install -Wno-portability
+ if test -z "$NOCONFIGURE"; then
+    exec ./configure $@
+ fi
+-- 
+2.25.1
+
