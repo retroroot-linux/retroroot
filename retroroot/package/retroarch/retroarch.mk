@@ -29,11 +29,25 @@ RETROARCH_CONFIG_OPTS = \
 	--disable-builtinminiupnpc \
 	--disable-builtinzlib
 
+ifeq ($(BR2_ARM_CPU_HAS_NEON),y)
+RETROARCH_CONFIG_OPTS += --enable-neon --enable-floathard
+endif
+
+ifeq ($(BR2_X86_CPU_HAS_SSE),y)
+RETROARCH_CONFIG_OPTS += --enable-sse
+endif
+
 ifeq ($(BR2_PACKAGE_ALSA_LIB),y)
 RETROARCH_DEPENDENCIES += alsa-lib
 RETROARCH_CONFIG_OPTS += --enable-alsa
 else
 RETROARCH_CONFIG_OPTS += --disable-alsa
+endif
+
+ifeq ($(BR2_PACKAGE_DBUS),y)
+RETROARCH_CONFIG_OPTS += --enable-dbus
+else
+RETROARCH_CONFIG_OPTS += --disable-dbus
 endif
 
 ifeq ($(BR2_PACKAGE_RETROARCH_OPENSSL),y)
@@ -219,6 +233,10 @@ define RETROARCH_INSTALL_TARGET_CMDS
 	$(TARGET_MAKE_ENV) $(MAKE) PREFIX=$(TARGET_DIR) -C $(@D)/libretro-common/audio/dsp_filters install
 	$(TARGET_MAKE_ENV) $(MAKE) PREFIX=$(TARGET_DIR) -C $(@D)/gfx/video_filters install
 	$(INSTALL) -m 0644 -D $(RETROARCH_PKGDIR)/retroarch.cfg $(TARGET_DIR)/etc/retroarch.cfg
+endef
+
+define RETROARCH_USERS
+	retroarch 2000 retroarch 2000 != - - retroarch
 endef
 
 $(eval $(generic-package))

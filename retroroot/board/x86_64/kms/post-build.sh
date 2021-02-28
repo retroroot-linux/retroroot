@@ -3,6 +3,7 @@ set -e
 DEVICE_TYPE="buildroot-x86_64"
 ARTIFACT_NAME="1.0"
 KERNEL_VERSION=$(grep 'BR2_LINUX_KERNEL_VERSION=' ${BR2_CONFIG} |awk -F'"' '{print $2}')
+BOARD_DIR="$(realpath $(dirname $0))"
 
 function parse_args(){
     local o O opts
@@ -49,8 +50,8 @@ function grub_fixup(){
   mkdir -p ${TARGET_DIR}/boot
   cp -rf ${BINARIES_DIR}/efi-part/* "${TARGET_DIR}/boot/"
   cp -rf ${BINARIES_DIR}/bzImage "${TARGET_DIR}/boot/vmlinuz-${KERNEL_VERSION}"
-  cp -f "retroarch/board/x86_64/kms/grub.cfg" "${BINARIES_DIR}/efi-part/EFI/BOOT/grub.cfg"
-  cp -f "retroarch/board/x86_64/kms/grub.cfg" "${TARGET_DIR}/boot/EFI/BOOT/grub.cfg"
+  cp -f "${BOARD_DIR}/grub.cfg" "${BINARIES_DIR}/efi-part/EFI/BOOT/grub.cfg"
+  cp -f "${BOARD_DIR}/grub.cfg" "${TARGET_DIR}/boot/EFI/BOOT/grub.cfg"
 }
 
 function main(){

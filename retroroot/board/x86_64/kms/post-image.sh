@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 BOARD_DIR="$(realpath $(dirname $0))"
-GENIMAGE_CFG="${BOARD_DIR}/genimage-efi.cfg"
+GENIMAGE_CFG="${BOARD_DIR}/genimage.cfg"
 DATA_PART_SIZE="32M"
 DEVICE_TYPE="buildroot-x86_64"
 GENERATE_MENDER_IMAGE="false"
@@ -88,14 +88,14 @@ function uuid_fixup(){
   set -x
   ROOT_UUID=$(dumpe2fs "${BINARIES_DIR}/rootfs.ext2" 2>/dev/null | sed -n 's/^Filesystem UUID: *\(.*\)/\1/p')
   DATA_UUID=$(dumpe2fs "${BINARIES_DIR}/data-part.ext4" 2>/dev/null | sed -n 's/^Filesystem UUID: *\(.*\)/\1/p')
-  sed "s/ROOT_UUID_TMP/${ROOT_UUID}/g" retroarch/board/x86_64/kms/genimage-efi.cfg > "${BINARIES_DIR}/genimage-efi.cfg"
-  sed "s/DATA_UUID_TMP/${DATA_UUID}/g" -i "${BINARIES_DIR}/genimage-efi.cfg"
+  sed "s/ROOT_UUID_TMP/${ROOT_UUID}/g" "${GENIMAGE_CFG}" > "${BINARIES_DIR}/genimage.cfg"
+  sed "s/DATA_UUID_TMP/${DATA_UUID}/g" -i "${BINARIES_DIR}/genimage.cfg"
   sed -i "s/ROOT_UUID_TMP/${ROOT_UUID}/g" "${BINARIES_DIR}/efi-part/EFI/BOOT/grub.cfg"
 }
 
 
 function generate_image(){
-    sh support/scripts/genimage.sh -c ${BINARIES_DIR}/genimage-efi.cfg
+    sh support/scripts/genimage.sh -c ${BINARIES_DIR}/genimage.cfg
 }
 
 
