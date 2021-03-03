@@ -4,7 +4,7 @@ set -e
 # CLEAN_ALL, BUILD_ALL, and BUILD_LIST are set in the docker/env file.
 main() {
   cd /mnt/docker
-  python3 -u ./init.py 2>&1
+  python3 -u ./init.py -e "${ENV_FILES}"
 }
 
 main "${@}"
