@@ -20,8 +20,8 @@
         "plymouth.fragment",
         "rpi-bluetooth.fragment",
         "rpi4-kms.fragment",
-        "rpi-wifi.fragment"
-        "retroarch-kms.fragment",
+        "rpi-wifi.fragment",
+        "retroarch-kms.fragment"
       ]
     }],
     "output_tree": "retroroot",
