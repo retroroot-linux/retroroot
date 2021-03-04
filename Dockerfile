@@ -132,7 +132,9 @@ COPY ${BUILDROOT_PATCH_DIR}* /tmp/patches/
 RUN set -e; \
   cd  /home/${BUILDROOT_USER}/${BUILDROOT_DIR}; \
   if [ -n "${BUILDROOT_PATCH_DIR}" ]; then \
-    for i in $(find /tmp/patches/ -name "*.patch" -exec readlink -f {} \; ); do patch -p1 < "${i}"; done; \
+    for i in $(find /tmp/patches/ -name "*.patch" -exec readlink -f {} \; |sort -n ); do \
+      echo "applying ${i}"; \
+      patch -p1 < "${i}"; done; \
   fi; \
   rm -rf ${BUILDROOT_PATCH_DIR};
 

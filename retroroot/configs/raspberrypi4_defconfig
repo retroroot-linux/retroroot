@@ -11,9 +11,9 @@ BR2_SYSTEM_DHCP="eth0"
 BR2_SYSTEM_DEFAULT_PATH="/bin:/sbin:/usr/bin:/usr/sbin"
 # BR2_ENABLE_LOCALE_PURGE is not set
 BR2_SYSTEM_ENABLE_NLS=y
-BR2_ROOTFS_OVERLAY="retroroot/board/raspberrypi4/overlay"
-BR2_ROOTFS_POST_BUILD_SCRIPT="retroroot/board/raspberrypi4/post-build.sh"
-BR2_ROOTFS_POST_IMAGE_SCRIPT="retroroot/board/raspberrypi4/post-image.sh"
+BR2_ROOTFS_OVERLAY="retroroot/board/common/overlay retroroot/board/raspberrypi/common/overlay retroroot/board/raspberrypi/raspberrypi4/overlay"
+BR2_ROOTFS_POST_BUILD_SCRIPT="retroroot/board/raspberrypi/raspberrypi4/post-build.sh"
+BR2_ROOTFS_POST_IMAGE_SCRIPT="retroroot/board/raspberrypi/raspberrypi4/post-image.sh"
 BR2_LINUX_KERNEL=y
 BR2_LINUX_KERNEL_CUSTOM_TARBALL=y
 BR2_LINUX_KERNEL_CUSTOM_TARBALL_LOCATION="$(call github,raspberrypi,linux,967d45b29ca2902f031b867809d72e3b3d623e7a)/linux-967d45b29ca2902f031b867809d72e3b3d623e7a.tar.gz"
@@ -37,6 +37,13 @@ BR2_TARGET_ROOTFS_EXT2_SIZE="512M"
 BR2_TARGET_ROOTFS_INITRAMFS=y
 BR2_TARGET_ROOTFS_INITRAMFS_DRACUT=y
 # BR2_TARGET_ROOTFS_TAR is not set
+BR2_TARGET_UBOOT=y
+BR2_TARGET_UBOOT_BOARD_DEFCONFIG="rpi_4_32b"
+BR2_TARGET_UBOOT_PATCH="retroroot/board/raspberrypi/raspberrypi4/patches/uboot"
+BR2_TARGET_UBOOT_NEEDS_DTC=y
+BR2_TARGET_UBOOT_NEEDS_OPENSSL=y
 BR2_PACKAGE_HOST_DOSFSTOOLS=y
 BR2_PACKAGE_HOST_GENIMAGE=y
 BR2_PACKAGE_HOST_MTOOLS=y
+BR2_PACKAGE_HOST_UBOOT_TOOLS_BOOT_SCRIPT=y
+BR2_PACKAGE_HOST_UBOOT_TOOLS_BOOT_SCRIPT_SOURCE="retroroot/board/raspberrypi/common/boot.txt"

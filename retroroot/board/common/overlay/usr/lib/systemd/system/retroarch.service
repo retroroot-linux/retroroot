@@ -1,0 +1,10 @@
+[Unit]
+Description=retroarch
+After=syslog.target network.target setup_directories.service data.mount
+
+[Service]
+ExecStart=/bin/retroarch -c /data/retroarch/config/retroarch.cfg
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target

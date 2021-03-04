@@ -1,2 +1,2 @@
 # A colon deliminated list of environment files.
-ENV_FILES="env.json"
+ENV_FILES="rpi3.json:rpi4.json:x86-kms.json"

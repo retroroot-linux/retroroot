@@ -1,0 +1,36 @@
+{
+  "buildroot_dir": "buildroot",
+  "user": "br-user",
+  "exit_after_build": false,
+  "update_buildroot": false,
+  "configs": [{
+    "build": false,
+    "clean": false,
+    "config_dir": "configs",
+    "defconfig": "x86_64_kms_defconfig",
+    "external_trees": [{
+      "name": "retroroot",
+      "fragment_dir": "configs/fragments",
+      "fragments": [
+        "audio.fragment",
+        "bluetooth.fragment",
+        "i18n.fragment",
+        "networking-tools.fragment",
+        "mender.fragment",
+        "mesa3d.fragment",
+        "plymouth.fragment",
+        "x86-kms.fragment",
+        "linux-firmware.fragment",
+        "retroarch-kms.fragment",
+        "wifi.fragment"
+      ]
+    }],
+    "output_tree": "retroroot",
+    "config_dir_tree": "retroroot",
+    "config_dir_name": "configs",
+    "output_dir_name": "output",
+    "remove": false,
+    "verbose": false,
+    "skip": false
+  }]
+}

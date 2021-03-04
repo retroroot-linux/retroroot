@@ -1,0 +1,13 @@
+diff --git a/tools/hid2hci.rules b/tools/hid2hci.rules.x
+index db6bb03..36be9d2 100644
+--- a/tools/hid2hci.rules
++++ b/tools/hid2hci.rules.x
+@@ -23,7 +23,7 @@ ENV{DEVTYPE}!="usb_device", GOTO="hid2hci_end"
+ # Unfortunately the only event seen is the BT device disappearing, so the mouse
+ # device needs to be chased down on the USB bus.
+ ATTR{bDeviceClass}=="e0", ATTR{bDeviceSubClass}=="01", ATTR{bDeviceProtocol}=="01", ATTR{idVendor}=="413c", \
+-  ENV{REMOVE_CMD}="/sbin/udevadm trigger --action=change --subsystem-match=usb --property-match=HID2HCI_SWITCH=1"
++  ENV{REMOVE_CMD}="/bin/udevadm trigger --action=change --subsystem-match=usb --property-match=HID2HCI_SWITCH=1"
+ 
+ # CSR devices
+ ATTR{idVendor}=="0a12|0458|05ac", ATTR{idProduct}=="1000", RUN+="hid2hci --method=csr --devpath=%p"

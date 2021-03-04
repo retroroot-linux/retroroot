@@ -1,0 +1,12 @@
+Bug-Debian: https://bugs.debian.org/804908
+Forwarded: not-needed
+Last-Update: 2017-03-17
+
+--- bluez-5.43.orig/obexd/src/org.bluez.obex.service.in
++++ bluez-5.43/obexd/src/org.bluez.obex.service.in
+@@ -1,4 +1,4 @@
+ [D-BUS Service]
+ Name=org.bluez.obex
+ Exec=@libexecdir@/obexd
+-SystemdService=dbus-org.bluez.obex.service
++SystemdService=obex.service

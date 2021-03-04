@@ -100,7 +100,7 @@ diff --git a/linux/linux.mk b/linux/linux.mk
 index 5e4b319cf1..f4ebdbf17f 100644
 --- a/linux/linux.mk
 +++ b/linux/linux.mk
-@@ -579,7 +579,12 @@ $(eval $(kconfig-package))
+@@ -578,7 +578,12 @@ $(eval $(kconfig-package))
  .PHONY: linux-rebuild-with-initramfs
  linux-rebuild-with-initramfs: $(LINUX_DIR)/.stamp_target_installed
  linux-rebuild-with-initramfs: $(LINUX_DIR)/.stamp_images_installed
