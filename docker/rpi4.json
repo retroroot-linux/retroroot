@@ -6,6 +6,9 @@
   "configs": [{
     "build": false,
     "clean": false,
+    "remove": false,
+    "skip": false,
+    "verbose": false,
     "defconfig": "raspberrypi4",
     "external_trees": [{
       "name": "retroroot",
@@ -27,8 +30,6 @@
     "output_tree": "retroroot",
     "config_dir_tree": "retroroot",
     "config_dir_name": "configs",
-    "output_dir_name": "output",
-    "remove": false,
-    "verbose": false
+    "output_dir_name": "output"
   }]
 }

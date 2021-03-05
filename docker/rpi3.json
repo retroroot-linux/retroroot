@@ -6,13 +6,16 @@
   "configs": [{
     "build": false,
     "clean": false,
+    "remove": true,
     "skip": false,
+    "verbose": false,
     "defconfig": "raspberrypi3",
     "external_trees": [{
       "name": "retroroot",
       "fragment_dir": "configs/fragments",
       "fragments": [
         "audio.fragment",
+        "bluetooth.fragment",
         "i18n.fragment",
         "networking-tools.fragment",
         "mender.fragment",
@@ -20,15 +23,13 @@
         "plymouth.fragment",
         "rpi-bluetooth.fragment",
         "rpi3-kms.fragment",
-        "retroarch-kms.fragment",
-        "wifi.fragment"
+        "rpi-wifi.fragment",
+        "retroarch-kms.fragment"
       ]
     }],
     "output_tree": "retroroot",
     "config_dir_tree": "retroroot",
     "config_dir_name": "configs",
-    "output_dir_name": "output",
-    "remove": false,
-    "verbose": false
+    "output_dir_name": "output"
   }]
 }

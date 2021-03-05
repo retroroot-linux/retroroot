@@ -1,0 +1,19 @@
+#!/bin/bash
+set -e
+
+function gen_key(){
+  SSH_DIR=/data/ssh
+  if [ ! -d ${SSH_DIR} ]; then
+    mkdir -p ${SSH_DIR}
+  fi
+  if [ ! -e ${SSH_DIR}/ssh_host_${1}_key ]; then
+    ssh-keygen -f ${SSH_DIR}/ssh_host_${1}_key -N '' -t ${1} > /dev/null
+  fi
+
+}
+
+gen_key "dsa"
+gen_key "ecdsa"
+gen_key "ed25519"
+gen_key "rsa"
+

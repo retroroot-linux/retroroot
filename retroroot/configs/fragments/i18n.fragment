@@ -1,4 +1,5 @@
 # Enable this for international language support
+BR2_PACKAGE_KBD=y
 BR2_SYSTEM_ENABLE_NLS=y
 BR2_PACKAGE_PERL=y
 BR2_PACKAGE_PERL_I18N=y
