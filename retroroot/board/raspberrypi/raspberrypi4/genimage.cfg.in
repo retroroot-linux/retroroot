@@ -9,7 +9,7 @@ image boot.vfat {
       "config.txt",
       "EFI/",
       "u-boot.bin",
-      "initrd-5.4.83-v7l.img",
+      "@INITRD@",
       "zImage"
     }
   }

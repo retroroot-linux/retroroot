@@ -91,6 +91,13 @@ else
 RETROARCH_CONFIG_OPTS += --disable-udev
 endif
 
+ifeq ($(BR2_PACKAGE_XORG7),y)
+RETROARCH_DEPENDENCIES += xorg7
+RETROARCH_CONFIG_OPTS += --enable-x11
+else
+RETROARCH_CONFIG_OPTS += --disable-x11
+endif
+
 ifeq ($(BR2_PACKAGE_SYSTEMD),y)
 RETROARCH_DEPENDENCIES += systemd
 RETROARCH_CONFIG_OPTS += --enable-systemd
@@ -110,6 +117,18 @@ RETROARCH_CONFIG_OPTS += --enable-egl
 RETROARCH_DEPENDENCIES += mesa3d xlib_libXxf86vm
 else
 RETROARCH_CONFIG_OPTS += --disable-egl
+endif
+
+ifeq ($(BR2_PACKAGE_RETROARCH_DISPMANX),y)
+RETROARCH_CONFIG_OPTS += \
+	--enable-dispmanx \
+	--enable-egl \
+	--enable-rpng \
+	--enable-rbmp \
+	--enable-rjpeg
+RETROARCH_DEPENDENCIES += rpi-userland
+else
+RETROARCH_CONFIG_OPTS += --disable-dispmanx
 endif
 
 ifeq ($(BR2_PACKAGE_RETROARCH_GLES),y)

@@ -1,0 +1,76 @@
+From 87d99601f6a1a25dd198f9befb0dc3cff48e0a64 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?=C3=89rico=20Rolim?= <erico.erc@gmail.com>
+Date: Mon, 10 Aug 2020 00:42:34 -0300
+Subject: [PATCH] [gfx] Fix static function placement.
+
+In gfx/drivers_context/vc_egl_ctx.c, move gfx_ctx_vc_bind_api
+declaration to before it's called by any other function, otherwise it
+warns about "warning: implicit declaration of function" and can error
+out with "error: conflicting types for 'gfx_ctx_vc_bind_api'" in certain
+cases.
+---
+ gfx/drivers_context/vc_egl_ctx.c | 44 ++++++++++++++++----------------
+ 1 file changed, 22 insertions(+), 22 deletions(-)
+
+diff --git a/gfx/drivers_context/vc_egl_ctx.c b/gfx/drivers_context/vc_egl_ctx.c
+index 3c52edb96af..646c79223b9 100644
+--- a/gfx/drivers_context/vc_egl_ctx.c
++++ b/gfx/drivers_context/vc_egl_ctx.c
+@@ -147,6 +147,28 @@ static void dispmanx_vsync_callback(DISPMANX_UPDATE_HANDLE_T u, void *data)
+    slock_unlock(vc->vsync_condition_mutex);
+ }
+ 
++static bool gfx_ctx_vc_bind_api(void *data,
++      enum gfx_ctx_api api, unsigned major, unsigned minor)
++{
++   vc_api = api;
++
++   switch (api)
++   {
++#ifdef HAVE_EGL
++      case GFX_CTX_OPENGL_API:
++         return egl_bind_api(EGL_OPENGL_API);
++      case GFX_CTX_OPENGL_ES_API:
++         return egl_bind_api(EGL_OPENGL_ES_API);
++      case GFX_CTX_OPENVG_API:
++         return egl_bind_api(EGL_OPENVG_API);
++#endif
++      default:
++         break;
++   }
++
++   return false;
++}
++
+ static void gfx_ctx_vc_destroy(void *data)
+ {
+    vc_ctx_data_t *vc = (vc_ctx_data_t*)data;
+@@ -456,28 +478,6 @@ static enum gfx_ctx_api gfx_ctx_vc_get_api(void *data)
+    return vc_api;
+ }
+ 
+-static bool gfx_ctx_vc_bind_api(void *data,
+-      enum gfx_ctx_api api, unsigned major, unsigned minor)
+-{
+-   vc_api = api;
+-
+-   switch (api)
+-   {
+-#ifdef HAVE_EGL
+-      case GFX_CTX_OPENGL_API:
+-         return egl_bind_api(EGL_OPENGL_API);
+-      case GFX_CTX_OPENGL_ES_API:
+-         return egl_bind_api(EGL_OPENGL_ES_API);
+-      case GFX_CTX_OPENVG_API:
+-         return egl_bind_api(EGL_OPENVG_API);
+-#endif
+-      default:
+-         break;
+-   }
+-
+-   return false;
+-}
+-
+ static void gfx_ctx_vc_input_driver(void *data,
+       const char *name,
+       input_driver_t **input, void **input_data)

@@ -16,11 +16,7 @@
       "fragments": [
         "audio.fragment",
         "bluetooth.fragment",
-        "i18n.fragment",
-        "networking-tools.fragment",
-        "mender.fragment",
-        "mesa3d.fragment",
-        "plymouth.fragment",
+        "mender-rpi.fragment",
         "rpi-bluetooth.fragment",
         "rpi4-kms.fragment",
         "rpi-wifi.fragment",

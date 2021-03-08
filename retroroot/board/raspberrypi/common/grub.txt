@@ -1,0 +1,2 @@
+# This is buil
+configfile (hd0,msdos1)/grub.cfg

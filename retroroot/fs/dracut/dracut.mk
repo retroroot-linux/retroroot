@@ -228,7 +228,7 @@ define ROOTFS_DRACUT_CMD
 		$(ROOTFS_DRACUT_FS_ENV) \
 		$(HOST_DIR)/bin/dracut \
 		$(ROOTFS_DRACUT_MKFS_CONF_OPTS) \
-		$(BINARIES_DIR)/rootfs.cpio)
+		$(BINARIES_DIR)/initrd-$(LINUX_VERSION_PROBED).img)
 endef
 
 $(eval $(rootfs))

@@ -6,7 +6,7 @@ services:
       args:
          BUILDROOT_USER: br-user
          BUILDROOT_DIR: buildroot
-         BUILDROOT_VERSION: 2021.02-rc3
+         BUILDROOT_VERSION: 2021.02
          EXTERNAL_TREES: retroroot
          BUILDROOT_PATCH_DIR: "retroroot/patches/buildroot/"
          UID: 1000

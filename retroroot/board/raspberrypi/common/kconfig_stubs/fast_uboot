@@ -1,0 +1,4 @@
+# Grub is our main bootloader, so make uboot as fast as possible.
+# Do not enumerate usb and set the boot delay to 0
+CONFIG_BOOTDELAY=0
+CONFIG_PREBOOT="pci enum;"

@@ -2,13 +2,14 @@
 set -e
 CWD=$(pwd)
 BOARD_DIR="$(realpath "$(dirname "$0")")"
-DEVICE_TYPE="rpi4-retroroot"
+DEVICE_TYPE="rpi4"
 GENIMAGE_CFG="${BOARD_DIR}/genimage.cfg"
 GENIMAGE_TMP="${BUILD_DIR}/genimage.tmp"
 PRODUCTION_DIR="${CWD}/retroroot/images/${DEVICE_TYPE}"
 MENDER_ARTIFACT="false"
-DATA_PART_SIZE="128M"
+DATA_PART_SIZE="32M"
 WEEK_NUM=$(date +%V)
+VERSION="false"
 
 parse_args(){
     local o O opts
@@ -80,26 +81,26 @@ make_extra_partitions(){
 create_image(){
   rm -rf "${GENIMAGE_TMP}"
   mkdir -p "${PRODUCTION_DIR}"
-
-  if [[ -e "${BINARIES_DIR}/u-boot.bin" ]]; then
-    cp "${BINARIES_DIR}/u-boot.bin" "${BINARIES_DIR}/kernel7l.img"
-  fi
+  mkdir -p "${TARGET_DIR}/etc/mender/"
+  cp "${BOARD_DIR}"/genimage.cfg.in "${BINARIES_DIR}"/genimage.cfg
+  sed s#@INITRD@#initrd-5.4.83-v7l.img#g -i "${BINARIES_DIR}"/genimage.cfg
+  
+  echo "artifact_name=${VERSION}-${WEEK_NUM}" > "${TARGET_DIR}/etc/mender/artifact_info"
+  echo "device_type=${DEVICE_TYPE}" > "${TARGET_DIR}/etc/mender/device_type"
 
   if [[ -e "${BINARIES_DIR}/config.txt" ]]; then
     rm -rf "${BINARIES_DIR}/config.txt"
   fi
-
-  if [[ -e "${BINARIES_DIR}/cmdline.txt" ]]; then
-    rm -rf "${BINARIES_DIR}/cmdline.txt"
-  fi
   cp -drpf "${BOARD_DIR}/config.txt" "${BINARIES_DIR}/config.txt"
-  cp -drpf "${BOARD_DIR}/cmdline.txt" "${BINARIES_DIR}/cmdline.txt"
+  rm -rf "${BINARIES_DIR}/EFI"
+  cp -rf "${BINARIES_DIR}"/efi-part/EFI "${BINARIES_DIR}"/EFI
+
   genimage \
     --rootpath "${ROOTPATH_TMP}" \
     --tmppath "${GENIMAGE_TMP}" \
     --inputpath "${BINARIES_DIR}" \
     --outputpath "${BINARIES_DIR}" \
-    --config "${BOARD_DIR}/genimage.cfg"
+    --config "${BINARIES_DIR}/genimage.cfg"
 }
 
 finalize(){

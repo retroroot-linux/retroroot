@@ -10,4 +10,3 @@ tty1::respawn:/sbin/getty -L  tty1 0 vt100 # HDMI console' "${TARGET_DIR}"/etc/i
 fi
 
 cp "${BOARD_DIR}/config.txt" "${BINARIES_DIR}/config.txt"
-cp "${BOARD_DIR}/cmdline.txt" "${BINARIES_DIR}/cmdline.txt"

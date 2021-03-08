@@ -1,19 +1,19 @@
 From fc75ad82ef07186347cbd42f225bee1877515a78 Mon Sep 17 00:00:00 2001
-From: Adam Duskett <Aduskett@rivian.com>
+From: Adam Duskett <Aduskett@gmail.com>
 Date: Wed, 3 Mar 2021 18:27:30 -0800
 Subject: [PATCH] package/{mender,mender-artifact}: bump package versions
 
 Bump mender to 2.4.2
 Bump mender-artifact to 3.4.1
 
-Signed-off-by: Adam Duskett <Aduskett@rivian.com>
+Signed-off-by: Adam Duskett <Aduskett@gmail.com>
 ---
  package/mender-artifact/mender-artifact.hash |  7 ++++---
  package/mender-artifact/mender-artifact.mk   |  5 +++--
- package/mender/Config.in                     |  1 +
+ package/mender/Config.in                     |  3 +--
  package/mender/mender.hash                   | 16 +++++++++-------
  package/mender/mender.mk                     | 14 ++++++++------
- 5 files changed, 25 insertions(+), 18 deletions(-)
+ 5 files changed, 25 insertions(+), 20 deletions(-)
 
 diff --git a/package/mender-artifact/mender-artifact.hash b/package/mender-artifact/mender-artifact.hash
 index a9fba29..a3af951 100644
@@ -66,17 +66,20 @@ index b2310d5..162f57e 100644
  HOST_MENDER_ARTIFACT_DEPENDENCIES = host-xz
  
 diff --git a/package/mender/Config.in b/package/mender/Config.in
-index 5cb3a3f..6a80c41 100644
+index 5cb3a3f..19bba30 100644
 --- a/package/mender/Config.in
 +++ b/package/mender/Config.in
-@@ -3,6 +3,7 @@ config BR2_PACKAGE_MENDER
+@@ -3,9 +3,8 @@ config BR2_PACKAGE_MENDER
  	depends on BR2_PACKAGE_HOST_GO_TARGET_ARCH_SUPPORTS
  	depends on BR2_PACKAGE_HOST_GO_TARGET_CGO_LINKING_SUPPORTS
  	depends on BR2_TOOLCHAIN_HAS_THREADS
 +	select BR2_PACKAGE_OPENSSL
  	select BR2_PACKAGE_XZ
- 	select BR2_PACKAGE_UBOOT_TOOLS if BR2_TARGET_UBOOT # runtime
- 	select BR2_PACKAGE_UBOOT_TOOLS_FWPRINTENV if BR2_TARGET_UBOOT # runtime
+-	select BR2_PACKAGE_UBOOT_TOOLS if BR2_TARGET_UBOOT # runtime
+-	select BR2_PACKAGE_UBOOT_TOOLS_FWPRINTENV if BR2_TARGET_UBOOT # runtime
+ 	help
+ 	  Mender is an open source over-the-air (OTA) software updater
+ 	  for embedded Linux devices. Mender comprises a client
 diff --git a/package/mender/mender.hash b/package/mender/mender.hash
 index f1eef65..43bb92d 100644
 --- a/package/mender/mender.hash
@@ -165,4 +168,3 @@ index ca24b85..2d38c39 100644
  
 -- 
 2.25.1
-

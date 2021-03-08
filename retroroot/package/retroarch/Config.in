@@ -22,6 +22,16 @@ config BR2_PACKAGE_RETROARCH_FFMPEG
 	help
 	  Video/music player implemented in libretro.
 
+config BR2_PACKAGE_RETROARCH_DISPMANX
+	bool "Dispmanx support"
+	depends on BR2_PACKAGE_RPI_USERLAND # libdrm
+	depends on !BR2_PACKAGE_MESA3D
+	help
+	  Raspberrypi Dispmanx support
+
+comment "Dispmanx support requires rpi-userland"
+	depends on !BR2_PACKAGE_RPI_USERLAND
+
 config BR2_PACKAGE_RETROARCH_EGL
 	bool "EGL support"
 	depends on BR2_TOOLCHAIN_HAS_THREADS # libdrm

@@ -1,7 +1,6 @@
 start_file=start.elf
 fixup_file=fixup.dat
-kernel=Image
-initramfs rootfs.cpio
+kernel=u-boot.bin
 disable_overscan=1
 
 # How much memory in MB to assign to the GPU on Pi models having
@@ -11,4 +10,4 @@ gpu_mem_512=100
 gpu_mem_1024=100
 
 dtoverlay=miniuart-bt
-dtoverlay=vc4-fkms-v3d-pi4
+dtoverlay=vc4-kms-v3d-pi4
