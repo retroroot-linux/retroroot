@@ -1,0 +1,24 @@
+Description: Add permission to bluetooth control for user into bluetooth 
+Forwarded: not-needed
+Origin: vendor
+Author: Nobuhiro Iwamatsu <iwamatsu@debian.org>
+
+diff --git a/src/bluetooth.conf b/src/bluetooth.conf
+index 8a1e258..d6e1c7a 100644
+--- a/src/bluetooth.conf
++++ b/src/bluetooth.conf
+@@ -22,6 +22,11 @@
+     <allow send_interface="org.mpris.MediaPlayer2.Player"/>
+   </policy>
+ 
++  <!-- allow users of bluetooth group to communicate -->
++  <policy group="bluetooth">
++    <allow send_destination="org.bluez"/>
++  </policy>
++
+   <policy context="default">
+     <allow send_destination="org.bluez"/>
+   </policy>
+-- 
+2.29.2
+

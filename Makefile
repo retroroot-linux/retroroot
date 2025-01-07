@@ -4,7 +4,7 @@ ENV_FILES ?= "x86_64.json"
 EXIT_AFTER_BUILD ?= false
 NO_BUILD ?= false
 VERBOSE ?= false
-TARGET ?= retroroot_x86_64_KMS
+TARGET ?= x86_64_kms
 
 .PHONY: help
 help:
@@ -15,13 +15,13 @@ help:
 	@printf "\tEXIT_AFTER_BUILD: Exit the container after a build. Default: false\n"
 	@printf "\tNO_BUILD: Do not build any config. Default: false\n"
 	@printf "\tVERBOSE: Run make instead of brmake. Default: false\n"
-	@printf "\tTARGET: Specify the target of which to run menuconfig. Default: retroroot_x86_64_KMS\n"
+	@printf "\tTARGET: Specify the target of which to run menuconfig. Default: x86_64_kms\n"
 	@printf "\n"
 	@printf "Targets:\n"
 	@printf "\tbuild: build the docker container.\n"
 	@printf "\tdown: Stop the dodcker container.\n"
 	@printf "\tkill: kill the docker container forcefully.\n"
-	@printf "\tmenuconfig: run menuconfig on a given target. Default: retroroot_x86_64_KMS\n"
+	@printf "\tmenuconfig: run menuconfig on a given target. Default: x86_64_kms\n"
 	@printf "\tshell: Run the docker container, do not build anyhting, and open a shell in the docker container.\n"
 	@printf "\tup: Run docker compose up with the above environment variables.\n"
 	@printf "\tupd: Run docker compose up -d with the above environment variables.\n"
@@ -41,7 +41,7 @@ down:
 .PHONY: menuconfig
 menuconfig:
 	@/bin/bash -c 'make kill && make APPLY_CONFIGS=${APPLY_CONFIGS} NO_BUILD=true upd; if [[ ${APPLY_CONFIGS} == "true" ]]; then sleep 5; fi'
-	@docker exec -it buildroot-retroarch /bin/bash -c 'cd ~/buildroot/retroarch/output/${TARGET} && make menuconfig'
+	@docker exec -it buildroot-retroroot /bin/bash -c 'cd ~/buildroot/retroroot/output/${TARGET} && make menuconfig'
 
 .PHONY: kill
 kill:
@@ -49,9 +49,9 @@ kill:
 
 .PHONY: shell
 shell:
-	@/bin/bash -c 'if [ -z $(docker container ps -aqf "name=buildroot-retroarch") ]; then make APPLY_CONFIGS=${APPLY_CONFIGS} NO_BUILD=true EXIT_AFTER_BUILD=false upd; fi;'
+	@/bin/bash -c 'if [ -z $(docker container ps -aqf "name=buildroot-retroroot") ]; then make APPLY_CONFIGS=${APPLY_CONFIGS} NO_BUILD=true EXIT_AFTER_BUILD=false upd; fi;'
 	@/bin/bash -c 'if [[ ${APPLY_CONFIGS} == "true" ]]; then sleep 5; fi'
-	@docker exec -it buildroot-retroarch /bin/bash
+	@docker exec -it buildroot-retroroot /bin/bash
 
 .PHONY: up
 up:
@@ -75,4 +75,4 @@ upd:
 
 .PHONY: x64-run
 x64-run:
-	@/bin/bash retroarch/board/x86_64/kms/qemu-run.sh
+	@/bin/bash retroroot/board/x86_64/kms/qemu-run.sh

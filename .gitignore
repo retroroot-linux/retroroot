@@ -1,6 +1,6 @@
-retroarch/output/
-retroarch/dl/
-retroarch/images/
+retroroot/output/
+retroroot/dl/
+retroroot/images/
 __pycache__/
 *.pyc
 *.jks

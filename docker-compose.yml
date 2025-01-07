@@ -1,5 +1,5 @@
 services:
-   buildroot-retroarch:
+   buildroot-retroroot:
     build:
       context: ./
       args:
@@ -7,8 +7,8 @@ services:
          BUILDROOT_DIR: buildroot
          BUILDROOT_VERSION: 2024.02.9
          # Space deliminated list of external trees of which to use.
-         EXTERNAL_TREES: retroarch
-         BUILDROOT_PATCH_DIR: "retroarch/patches/buildroot/"
+         EXTERNAL_TREES: retroroot
+         BUILDROOT_PATCH_DIR: "retroroot/patches/buildroot/"
          UID: 1000
          GID: 1000
     environment:
@@ -27,8 +27,8 @@ services:
     tty: true
     volumes:
       - ./:/mnt
-      - buildroot-retroarch-ccache:/home/ccache
-    image: buildroot-retroarch:latest
-    container_name:  buildroot-retroarch
+      - buildroot-retroroot-ccache:/home/ccache
+    image: buildroot-retroroot:latest
+    container_name:  buildroot-retroroot
 volumes:
-  buildroot-retroarch-ccache:
+  buildroot-retroroot-ccache:

@@ -1,0 +1,19 @@
+Description: Move path of hogsuspend to /run.
+Forwarded: not-needed
+Origin: vendor
+Bug-Debian: http://bugs.debian.org/759188
+Author: Nobuhiro Iwamatsu <iwamatsu@debian.org>
+
+diff --git a/profiles/input/suspend-dummy.c b/profiles/input/suspend-dummy.c
+index 542ae25..580213e 100644
+--- a/profiles/input/suspend-dummy.c
++++ b/profiles/input/suspend-dummy.c
+@@ -40,7 +40,7 @@
+ #include "src/log.h"
+ #include "suspend.h"
+ 
+-#define HOG_SUSPEND_FIFO	"/tmp/hogsuspend"
++#define HOG_SUSPEND_FIFO	"/run/hogsuspend"
+ 
+ static suspend_event suspend_cb = NULL;
+ static resume_event resume_cb = NULL;

@@ -1,0 +1,42 @@
+image boot.vfat {
+  vfat {
+    files = {
+      "rpi-firmware/fixup.dat",
+      "rpi-firmware/start.elf",
+      "rpi-firmware/overlays",
+      "bcm2711-rpi-4-b.dtb",
+      "boot.scr",
+      "config.txt",
+      "EFI/",
+      "u-boot.bin",
+      "@INITRD@",
+      "zImage"
+    }
+  }
+  size = 64M
+}
+
+image sdcard.img {
+  hdimage {}
+
+  partition boot {
+    partition-type = 0xC
+    bootable = "true"
+    image = "boot.vfat"
+  }
+
+  partition rootfsa {
+    partition-type = 0x83
+    image = "rootfs.ext4"
+  }
+
+  partition rootfsb {
+    partition-type = 0x83
+    image = "rootfs.ext4"
+  }
+
+  partition data {
+    partition-type = 0x83
+    image = "data.ext4"
+  }
+}

@@ -1,17 +1,15 @@
 {
-  "environment": [{
-    "buildroot_dir_name": "buildroot",
-    "exit_after_build": false,
-    "update_buildroot": false,
-    "user": "br-user"
-  }],
+  "buildroot_dir": "buildroot",
+  "user": "br-user",
+  "exit_after_build": false,
+  "update_buildroot": false,
   "configs": [{
-    "build": true,
+    "build": false,
     "clean": false,
-    "remove": false,
-    "verbose": false,
+    "remove": true,
     "skip": false,
-    "defconfig": "x86_64_kms_defconfig",
+    "verbose": false,
+    "defconfig": "raspberrypi3",
     "external_trees": [{
       "name": "retroroot",
       "fragment_dir": "configs/fragments",
@@ -22,10 +20,10 @@
         "networking-tools.fragment",
         "mender.fragment",
         "mesa3d.fragment",
-        "x86-kms.fragment",
-        "linux-firmware.fragment",
-        "retroarch-kms.fragment",
-        "wifi.fragment"
+        "rpi-bluetooth.fragment",
+        "rpi3-kms.fragment",
+        "rpi-wifi.fragment",
+        "retroarch-kms.fragment"
       ]
     }],
     "output_tree": "retroroot",
