@@ -18,6 +18,7 @@
       "fragments": [
         "audio.fragment",
         "bluetooth.fragment",
+        "fonts.fragment",
         "i18n.fragment",
         "networking-tools.fragment",
         "mender.fragment",

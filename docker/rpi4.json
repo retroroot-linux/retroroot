@@ -16,6 +16,7 @@
       "fragments": [
         "audio.fragment",
         "bluetooth.fragment",
+        "fonts.fragment",
         "mender-rpi.fragment",
         "rpi-bluetooth.fragment",
         "rpi4-kms.fragment",
