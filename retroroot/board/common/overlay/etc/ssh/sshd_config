@@ -10,7 +10,7 @@ AuthorizedKeysFile	/data/ssh/authorized_keys
 PasswordAuthentication yes
 PermitEmptyPasswords yes
 ChallengeResponseAuthentication no
-UsePAM yes
+
 X11Forwarding no
 UseDNS no
 AcceptEnv LANG LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES

@@ -1,7 +1,7 @@
 APPLY_CONFIGS ?= false
 CLEAN_AFTER_BUILD ?= false
 ENV_FILES ?= "x86_64.json"
-EXIT_AFTER_BUILD ?= false
+EXIT_AFTER_BUILD ?= true
 NO_BUILD ?= false
 VERBOSE ?= false
 TARGET ?= x86_64_kms
@@ -18,7 +18,8 @@ help:
 	@printf "\tTARGET: Specify the target of which to run menuconfig. Default: x86_64_kms\n"
 	@printf "\n"
 	@printf "Targets:\n"
-	@printf "\tbuild: build the docker container.\n"
+	@printf "\tbuild-docker: build the docker container.\n"
+	@printf "\tbuild: build the image"
 	@printf "\tdown: Stop the dodcker container.\n"
 	@printf "\tkill: kill the docker container forcefully.\n"
 	@printf "\tmenuconfig: run menuconfig on a given target. Default: x86_64_kms\n"
@@ -30,9 +31,19 @@ help:
 	@printf "x64-run: Run the x64 virtual image. Requires virbr0 and /dev/kvm to exist."
 	@printf "\n\n"
 
+.PHONY: build-docker
+build-docker:
+	@docker compose build
+
 .PHONY: build
 build:
-	@docker compose build
+	APPLY_CONFIGS=${APPLY_CONFIGS} \
+	VERBOSE=${VERBOSE} \
+	ENV_FILES=${ENV_FILES} \
+	EXIT_AFTER_BUILD=${EXIT_AFTER_BUILD} \
+	NO_BUILD=${NO_BUILD} \
+	CLEAN_AFTER_BUILD=${CLEAN_AFTER_BUILD} \
+	docker compose up --abort-on-container-exit
 
 .PHONY: down
 down:

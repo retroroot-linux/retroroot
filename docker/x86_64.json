@@ -1,7 +1,7 @@
 {
   "environment": [{
     "buildroot_dir_name": "buildroot",
-    "exit_after_build": false,
+    "exit_after_build": true,
     "update_buildroot": false,
     "user": "br-user"
   }],
