@@ -8,6 +8,7 @@ PermitRootLogin yes
 PubkeyAuthentication yes
 AuthorizedKeysFile	/data/ssh/authorized_keys
 PasswordAuthentication yes
+PermitEmptyPasswords yes
 ChallengeResponseAuthentication no
 UsePAM yes
 X11Forwarding no
