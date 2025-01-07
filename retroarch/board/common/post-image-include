@@ -1,0 +1,138 @@
+#!/usr/bin/env bash
+set -e
+shopt -s inherit_errexit
+ARTIFACT_NAME="master"
+DATA_PART_SIZE="256M"
+DATA_PART="${BINARIES_DIR}"/data-part
+GENERATE_MENDER_IMAGE="false"
+
+
+# This list is in order from top to bottom of the best to worst compression
+# methods.
+# shellcheck disable=SC2154
+get_best_compression() {
+  check=$(grep -w 'BR2_PACKAGE_ZSTD=y' "${BR2_CONFIG}" || true)
+  if [[ -n "${check}" ]]; then
+    echo "zstd_best"
+    return
+  fi
+
+  check=$(grep -w 'BR2_PACKAGE_XZ=y' "${BR2_CONFIG}" || true)
+  if [[ -n "${check}" ]]; then
+    echo "lzma"
+    return
+  fi
+
+  check=$(grep -w 'BR2_PACKAGE_GZIP=y' "${BR2_CONFIG}" || true)
+  if [[ -n "${check}" ]]; then
+    echo "gzip"
+    return
+  fi
+  echo "none"
+}
+
+
+# See https://northerntech.atlassian.net/browse/MEN-2585
+# shellcheck disable=SC2154
+generate_mender_bootstrap_artifact() {
+  compression=$(get_best_compression)
+  rm -rf "${DATA_PART:?}"
+  rm -rf "${BINARIES_DIR:?}"/data-part.ext4
+  rm -rf "${BINARIES_DIR:?}"/bootstrap.mender
+
+  mkdir -p "${DATA_PART}"/mender
+  cd "${DATA_PART}"/mender
+  ln -sf /etc/mender/mender.conf mender.conf
+  cd -
+
+  img_checksum=$(sha256sum "${BINARIES_DIR}"/rootfs.ext4 | awk '{print $1}' || true)
+  if [[ -z "${img_checksum}" ]]; then
+    echo "Could not determine the checksum for ${BINARIES_DIR}/rootfs.ext4!"
+    exit 1
+  fi
+
+  "${HOST_DIR}"/bin/mender-artifact \
+    write bootstrap-artifact \
+    --compression "${compression}" \
+    --artifact-name "${ARTIFACT_NAME}" \
+    --device-type "${DEVICE_TYPE}" \
+    --provides "rootfs-image.version:${ARTIFACT_NAME}" \
+    --provides "rootfs-image.checksum:${img_checksum}" \
+    --clears-provides "rootfs-image.*" \
+    --output-path "${BINARIES_DIR}"/bootstrap.mender \
+    --version 3
+    cp "${BINARIES_DIR}"/bootstrap.mender "${DATA_PART}"/mender/bootstrap.mender
+}
+
+
+# Create a mender image.
+# shellcheck disable=SC2154
+generate_mender_image() {
+  compression=$(get_best_compression)
+  MENDER_IMAGE="${DEVICE_TYPE}"-"${ARTIFACT_NAME}".mender
+
+  if [[ ${GENERATE_MENDER_IMAGE} == "true" ]]; then
+    echo "Creating ${BINARIES_DIR}/${DEVICE_TYPE}-${ARTIFACT_NAME}.mender"
+    img_checksum=$(sha256sum "${BINARIES_DIR}"/rootfs.ext4 | awk '{print $1}' || true)
+    "${HOST_DIR}"/bin/mender-artifact \
+      write rootfs-image \
+      --compression "${compression}" \
+      --artifact-name "${BR2_VERSION}" \
+      --device-type "${DEVICE_TYPE}" \
+      --provides "rootfs-image.version:${ARTIFACT_NAME}" \
+      --provides "rootfs-image.checksum:${img_checksum}" \
+      --file "${BINARIES_DIR}"/rootfs.ext2 \
+      --output-path "${BINARIES_DIR}"/"${MENDER_IMAGE}"
+    cp "${BINARIES_DIR}"/"${MENDER_IMAGE}" "${DATA_PART}"/mender
+  fi
+}
+
+setup_retroroot_directories() {
+  RETROARCH="${DATA_PART}"/retroarch
+  rm -rf "${RETROARCH}"
+  mkdir -p "${RETROARCH}"/{cache,config,content,cores,databases,downloads}
+  mkdir -p "${RETROARCH}"/{gui,info,logs,options,screenshots,thumbnails,video}
+
+  mkdir -p "${RETROARCH}"/config/{autoconfig,overlay,playlists,remaps}
+  mkdir -p "${RETROARCH}"/databases/{cursors,cheats,rdb}
+  mkdir -p "${RETROARCH}"/gui/rgui
+  mkdir -p "${RETROARCH}"/options/core
+  mkdir -p "${RETROARCH}"/video/{layouts,shaders}
+
+  }
+
+
+# Create the data partition
+make_data_partition() {
+  generate_mender_bootstrap_artifact
+  generate_mender_image
+  setup_retroroot_directories
+  "${HOST_DIR}"/sbin/mkfs.ext4 \
+  -d "${BINARIES_DIR}"/data-part \
+  -r 1 \
+  -N 0 \
+  -m 5 \
+  -L "data" \
+  -O "${1}" "${BINARIES_DIR}"/data-part.ext4 "${DATA_PART_SIZE}"
+  "${HOST_DIR}"/sbin/e2fsck -y "${BINARIES_DIR}"/data-part.ext4
+}
+
+
+# Parse arguments.
+parse_args() {
+    local o O opts
+    o='a:d:g:t:'
+    O='artifact-name:,data-part-size:,device-type:,generate-mender-image:'
+    opts="$(getopt -o "${o}" -l "${O}" -- "${@}")"
+    eval set -- "${opts}"
+    while [[ ${#} -gt 0 ]]; do
+        case "${1}" in
+        (-a|--artifact-name) ARTIFACT_NAME="${2}"; shift 2;;
+        (-d|--data-part-size) DATA_PART_SIZE="${2}"; shift 2;;
+        (-g|--generate-mender-image) GENERATE_MENDER_IMAGE="${2}"; shift 2;;
+        (-t|--device-type) DEVICE_TYPE="${2}"; shift 2;;
+        (--) shift; break;;
+        *) echo "Invalid option!" exit 1;;
+        esac
+    done
+}

@@ -1,0 +1,75 @@
+From 177ed0721e4ecbcf078f4960e26c34405e09672c Mon Sep 17 00:00:00 2001
+From: Adam Duskett <aduskett@gmail.com>
+Date: Tue, 7 Jan 2025 12:39:41 +0100
+Subject: [PATCH] package/boost: install cmake files
+
+This reverts commit 4349746dac6f55b0b0faca21a7e609fb67d1471b
+which states:
+    commit 4349746dac6f55b0b0faca21a7e609fb67d1471b
+    Author: Fabrice Fontaine <fontaine.fabrice@gmail.com>
+    Date:   Thu Apr 18 11:13:50 2019 +0200
+
+    package/boost: don't install boost cmake files
+
+    Since version 1.70.0, boost installs its own cmake files which are
+    utterly broken so don't install them otherwise all cmake packages using
+    boost (host-thrift, domoticz, i2pd ...) will fail because
+    BOOST_INCLUDE_DIRS will be empty
+
+    Fixes:
+      - http://autobuild.buildroot.org/results/4ada26bab5c1e6504c7d8c92672326ced1d336df
+
+    Signed-off-by: Fabrice Fontaine <fontaine.fabrice@gmail.com>
+    Signed-off-by: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+
+However, this has since been fixed upstream in the five years this change
+has been in Buildroot. Furthermore, having --no-cmake-config breaks packages
+expecting to dynamically link to boost::log with a multitude of `undefined
+reference to boost::log` errors.
+See: https://github.com/mendersoftware/mender/pull/1663 for one such example.
+
+As the --no-cmake-config is no longer needed because the original problem has
+long since been fixed upstream, it is safe to revert the change.
+
+Tested with the following packages as a smoke test:
+
+  - host-thrift
+  - domoticz
+  - i2pd
+  - libcpprestsdk
+  - log4cxx
+  - mpd
+  - libcamera-apps
+
+Signed-off-by: Adam Duskett <aduskett@gmail.com>
+Signed-off-by: Arnout Vandecappelle <arnout@mind.be>
+---
+ package/boost/boost.mk | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/package/boost/boost.mk b/package/boost/boost.mk
+index 367ec37f..c0d17f76 100644
+--- a/package/boost/boost.mk
++++ b/package/boost/boost.mk
+@@ -103,7 +103,7 @@ BOOST_TARGET_CXXFLAGS += -I$(STAGING_DIR)/usr/include/python$(PYTHON3_VERSION_MA
+ BOOST_DEPENDENCIES += python3
+ endif
+ 
+-HOST_BOOST_OPTS += --no-cmake-config toolset=gcc threading=multi \
++HOST_BOOST_OPTS += toolset=gcc threading=multi \
+ 	variant=release link=shared runtime-link=shared -j$(PARALLEL_JOBS) -q \
+ 	--ignore-site-config --layout=system --prefix=$(HOST_DIR) \
+ 	--user-config=$(@D)/user-config.jam
+@@ -116,8 +116,7 @@ else
+ BOOST_ABI = sysv
+ endif
+ 
+-BOOST_OPTS += --no-cmake-config \
+-	toolset=gcc \
++BOOST_OPTS += toolset=gcc \
+ 	threading=multi \
+ 	abi=$(BOOST_ABI) \
+ 	variant=$(if $(BR2_ENABLE_RUNTIME_DEBUG),debug,release) \
+-- 
+2.47.1
+

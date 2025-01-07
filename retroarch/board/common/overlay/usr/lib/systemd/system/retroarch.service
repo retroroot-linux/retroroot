@@ -1,0 +1,14 @@
+[Unit]
+Description=retroarch
+After=data.mount
+
+[Service]
+Type=idle
+User=root
+Group=root
+ExecStart=/bin/retroarch -c /data/retroarch/config/retroarch.cfg
+Restart=always
+KillMode=mixed
+
+[Install]
+WantedBy=multi-user.targe

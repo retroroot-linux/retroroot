@@ -1,0 +1,13 @@
+[Unit]
+Description=Setup retroarch dirs
+After=data.mount
+Before=retroarch.service
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+ExecStart=/bin/bash /usr/bin/setup_directories
+
+[Install]
+WantedBy=retroarch.service

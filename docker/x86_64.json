@@ -1,0 +1,37 @@
+{
+  "environment": [{
+    "buildroot_dir_name": "buildroot",
+    "exit_after_build": false,
+    "update_buildroot": false,
+    "user": "br-user"
+  }],
+  "configs": [{
+    "build": true,
+    "clean": false,
+    "remove": false,
+    "verbose": false,
+    "skip": false,
+    "defconfig": "retroroot_x86_64_KMS_defconfig",
+    "external_trees": [{
+      "name": "retroarch"
+    }],
+    "output_tree": "retroarch",
+    "config_dir_tree": "retroarch",
+    "config_dir_name": "configs",
+    "output_dir_name": "output"
+  },{
+    "build": false,
+    "clean": false,
+    "remove": false,
+    "verbose": false,
+    "skip": true,
+    "defconfig": "retroroot_x86_64_root_defconfig",
+    "external_trees": [{
+      "name": "retroarch"
+    }],
+    "output_tree": "retroarch",
+    "config_dir_tree": "retroarch",
+    "config_dir_name": "configs",
+    "output_dir_name": "output"
+  }]
+}

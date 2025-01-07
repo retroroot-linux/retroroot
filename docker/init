@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -e
+
+main() {
+  cd /mnt/docker
+  python3 -u ./init.py -e "${ENV_FILES}"
+  if [ "${EXIT_AFTER_BUILD}" = "true" ]; then
+    echo "######## Exiting ########"
+    exit 0
+  fi
+  # This keeps the docker image from exiting.
+  exec /bin/bash
+}
+main "${@}"

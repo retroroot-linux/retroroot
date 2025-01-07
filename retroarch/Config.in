@@ -1,0 +1,5 @@
+menu "Target packages"
+source "$BR2_EXTERNAL_RETROROOT_PATH/package/lmdb/Config.in"
+source "$BR2_EXTERNAL_RETROROOT_PATH/package/retroarch/Config.in"
+source "$BR2_EXTERNAL_RETROROOT_PATH/package/retroarch-assets/Config.in"
+endmenu

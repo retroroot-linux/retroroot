@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -e
+DEVICE_TYPE="mender"
+
+
+# shellcheck disable=SC2154
+setup_mender(){
+  echo "device_type=${DEVICE_TYPE}" > "${TARGET_DIR}"/etc/mender/device_type
+  mkdir -p "${TARGET_DIR}"/data
+  cd "${TARGET_DIR}"
+  mkdir -p var/lock
+  rm -rf var/lib/mender
+  cd var/lib
+  ln -sf /data/mender mender
+}
+
+
+parse_args(){
+    local o O opts
+    o='a:d:g:t:'
+    O='artifact-name:,data-part-size:,device-type:,generate-mender-image:'
+    opts="$(getopt -o "${o}" -l "${O}" -- "${@}")"
+    eval set -- "${opts}"
+    while [[ ${#} -gt 0 ]]; do
+        case "${1}" in
+        (-a|--artifact-name) shift 2;;
+        (-d|--data-part-size) shift 2;;
+        (-g|--generate-mender-image) shift 2;;
+        (-t|--device-type) DEVICE_TYPE="${2}"; shift 2;;
+        (--) shift; break;;
+        *) exit 1;;
+        esac
+    done
+}

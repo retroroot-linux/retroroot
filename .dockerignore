@@ -1,3 +1,2 @@
-.git
-Dockerfile
-build
+retroarch/output/
+retroarch/dl/

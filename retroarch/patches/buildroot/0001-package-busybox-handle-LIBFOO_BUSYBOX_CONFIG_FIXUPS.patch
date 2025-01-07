@@ -1,0 +1,40 @@
+From 6d59db307b24261f5ac007ba664722fc32182e0d Mon Sep 17 00:00:00 2001
+From: Adam Duskett <aduskett@gmail.com>
+Date: Fri, 4 Oct 2024 16:59:00 +0200
+Subject: [PATCH 3/4] package/busybox: handle LIBFOO_BUSYBOX_CONFIG_FIXUPS
+
+Signed-off-by: Adam Duskett <aduskett@gmail.com>
+---
+ package/busybox/busybox.mk | 1 +
+ package/pkg-generic.mk     | 3 +++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/package/busybox/busybox.mk b/package/busybox/busybox.mk
+index 942875ee0e..4baa423201 100644
+--- a/package/busybox/busybox.mk
++++ b/package/busybox/busybox.mk
+@@ -384,6 +384,7 @@ define BUSYBOX_KCONFIG_FIXUP_CMDS
+ 	$(BUSYBOX_SET_SELINUX)
+ 	$(BUSYBOX_SET_LESS_FLAGS)
+ 	$(BUSYBOX_SET_INDIVIDUAL_BINARIES)
++	$(PACKAGES_BUSYBOX_CONFIG_FIXUPS)
+ endef
+ 
+ define BUSYBOX_BUILD_CMDS
+diff --git a/package/pkg-generic.mk b/package/pkg-generic.mk
+index 9ec84d0f45..dc500f6d32 100644
+--- a/package/pkg-generic.mk
++++ b/package/pkg-generic.mk
+@@ -1222,6 +1222,9 @@ endif
+ ifneq ($$($(2)_USERS),)
+ PACKAGES_USERS += $$($(2)_USERS)$$(sep)
+ endif
++ifneq ($$($(2)_BUSYBOX_CONFIG_FIXUPS),)
++PACKAGES_BUSYBOX_CONFIG_FIXUPS += $$($(2)_BUSYBOX_CONFIG_FIXUPS)$$(sep)
++endif
+ ifneq ($$($(2)_LINUX_CONFIG_FIXUPS),)
+ PACKAGES_LINUX_CONFIG_FIXUPS += $$($(2)_LINUX_CONFIG_FIXUPS)$$(sep)
+ endif
+-- 
+2.46.2
+

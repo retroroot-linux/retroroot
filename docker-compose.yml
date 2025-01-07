@@ -1,0 +1,34 @@
+services:
+   buildroot-retroarch:
+    build:
+      context: ./
+      args:
+         BUILDROOT_USER: br-user
+         BUILDROOT_DIR: buildroot
+         BUILDROOT_VERSION: 2024.02.9
+         # Space deliminated list of external trees of which to use.
+         EXTERNAL_TREES: retroarch
+         BUILDROOT_PATCH_DIR: "retroarch/patches/buildroot/"
+         UID: 1000
+         GID: 1000
+    environment:
+      - APPLY_CONFIGS
+      - CLEAN_AFTER_BUILD
+      - ENV_FILES
+      - EXIT_AFTER_BUILD
+      - NO_BUILD
+      - VERBOSE
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
+    privileged: true
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./:/mnt
+      - buildroot-retroarch-ccache:/home/ccache
+    image: buildroot-retroarch:latest
+    container_name:  buildroot-retroarch
+volumes:
+  buildroot-retroarch-ccache:

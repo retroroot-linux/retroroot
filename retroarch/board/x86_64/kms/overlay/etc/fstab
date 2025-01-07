@@ -1,0 +1,10 @@
+# <file system>  <mount pt>   <type>     <options>                         <dump>  <pass>
+/dev/sda1       /boot          vfat      defaults                             0      0
+/dev/root       /              ext4      defaults,rw                          0      1
+/dev/sda4       /data          ext4      defaults,rw                          0      0
+tmpfs           /dev/shm       tmpfs     defaults,rw                          0      0
+tmpfs           /var/tmp       tmpfs     mode=0700,nodev,nosuid,noexec        0      0
+tmpfs           /var/cache     tmpfs     mode=0700,nodev,nosuid,noexec        0      0
+tmpfs           /var/lock      tmpfs     mode=0700,nodev,nosuid,noexec        0      0
+tmpfs           /var/spool     tmpfs     mode=0700,nodev,nosuid,noexec        0      0
+devpts          /dev/pts       devpts    defaults,gid=5,mode=620              0      0
