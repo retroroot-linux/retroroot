@@ -69,8 +69,8 @@ config BR2_PACKAGE_RETROARCH_EGL
 	  the virtual terminal. It is a fairly obscure feature, but
 	  very powerful in a console scenario.
 
-comment "EGL support needs an OpenGL EGL backend provided by mesa3d"
-	depends on BR2_PACKAGE_XORG7
+comment "EGL support needs an OpenGL EGL backend provided by mesa3d and xorg7"
+	depends on !BR2_PACKAGE_XORG7
 	depends on !BR2_PACKAGE_MESA3D_OPENGL_EGL
 
 config BR2_PACKAGE_RETROARCH_GLES
@@ -84,13 +84,13 @@ config BR2_PACKAGE_RETROARCH_GLES
 	  the virtual terminal. It is a fairly obscure feature, but
 	  very powerful in a console scenario.
 
-comment "GLES support needs an OpenGLES backend provided by mesa3d"
-	depends on BR2_PACKAGE_XORG7
+comment "GLES support needs an OpenGLES backend provided by mesa3d and xorg7"
+	depends on !BR2_PACKAGE_XORG7
 	depends on !BR2_PACKAGE_MESA3D_OPENGL_ES
 
 config BR2_PACKAGE_RETROARCH_KMS
 	bool "KMS support"
-	select BR2_PACKAGE_LIBDRM
+	depends on BR2_PACKAGE_MESA3D_OPENGL_EGL
 	help
 	  KMS (Kernel Mode Setting) mode is a feature where RetroArch
 	  can use the OpenGL driver outside Xorg, running straight in

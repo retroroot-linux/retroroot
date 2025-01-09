@@ -1,0 +1,47 @@
+image boot.vfat {
+  vfat {
+    files = {
+      "bcm2710-rpi-zero-2-w.dtb",
+      "rpi-firmware/bootcode.bin",
+      "rpi-firmware/cmdline.txt",
+      "rpi-firmware/config.txt",
+      "rpi-firmware/fixup.dat",
+      "rpi-firmware/overlays",
+      "rpi-firmware/start.elf",
+      "zImage",
+#OVERLAY_DIR#
+    }
+  }
+  size = 128M
+}
+
+image DISK_IMG {
+  hdimage {
+    partition-table-type = "gpt"
+  }
+
+  partition boot {
+    image = "boot.vfat"
+    partition-type-uuid = U
+    offset = 32k
+    bootable = true
+  }
+
+  partition rootfsa {
+    partition-type-uuid = 4f68bce3-e8cd-4db1-96e7-fbcaf984b709
+    partition-uuid = UUID_ROOT_TMP
+    image = "rootfs.ext2"
+  }
+
+  partition rootfsb {
+    partition-type-uuid = 4f68bce3-e8cd-4db1-96e7-fbcaf984b709
+    partition-uuid = UUID_ROOT_TMP
+    image = "rootfs.ext2"
+  }
+
+  partition data {
+    partition-type-uuid = 0fc63daf-8483-4772-8e79-3d69d8477de4
+    partition-uuid = UUID_DATA_TMP
+    image = "data-part.ext4"
+  }
+}

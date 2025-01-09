@@ -1,0 +1,10 @@
+[Unit]
+Description=Setup data directories
+After=data.mount
+
+[Service]
+ExecStart=/usr/bin/setup_directories
+KillSignal=SIGQUIT
+
+[Install]
+WantedBy=multi-user.target

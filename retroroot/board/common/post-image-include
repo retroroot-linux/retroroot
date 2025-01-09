@@ -36,8 +36,6 @@ get_best_compression() {
 # shellcheck disable=SC2154
 generate_mender_bootstrap_artifact() {
   compression=$(get_best_compression)
-  rm -rf "${DATA_PART:?}"
-  rm -rf "${BINARIES_DIR:?}"/data-part.ext4
   rm -rf "${BINARIES_DIR:?}"/bootstrap.mender
 
   mkdir -p "${DATA_PART}"/mender
@@ -68,11 +66,11 @@ generate_mender_bootstrap_artifact() {
 # Create a mender image.
 # shellcheck disable=SC2154
 generate_mender_image() {
-  compression=$(get_best_compression)
-  MENDER_IMAGE="${DEVICE_TYPE}"-"${ARTIFACT_NAME}".mender
-
   if [[ ${GENERATE_MENDER_IMAGE} == "true" ]]; then
+    generate_mender_bootstrap_artifact
     echo "Creating ${BINARIES_DIR}/${DEVICE_TYPE}-${ARTIFACT_NAME}.mender"
+    compression=$(get_best_compression)
+    MENDER_IMAGE="${DEVICE_TYPE}"-"${ARTIFACT_NAME}".mender
     img_checksum=$(sha256sum "${BINARIES_DIR}"/rootfs.ext4 | awk '{print $1}' || true)
     "${HOST_DIR}"/bin/mender-artifact \
       write rootfs-image \
@@ -104,7 +102,8 @@ setup_retroroot_directories() {
 
 # Create the data partition
 make_data_partition() {
-  generate_mender_bootstrap_artifact
+  rm -rf "${DATA_PART:?}"
+  rm -rf "${BINARIES_DIR:?}"/data-part.ext4
   generate_mender_image
   setup_retroroot_directories
   "${HOST_DIR}"/sbin/mkfs.ext4 \
