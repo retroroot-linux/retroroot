@@ -1,0 +1,33 @@
+{
+  "buildroot_dir": "buildroot",
+  "user": "br-user",
+  "exit_after_build": false,
+  "update_buildroot": false,
+  "configs": [{
+    "build": false,
+    "clean": false,
+    "remove": false,
+    "skip": false,
+    "verbose": false,
+    "defconfig": "raspberrypi5",
+    "external_trees": [{
+      "name": "retroroot",
+      "fragment_dir": "configs/fragments",
+      "fragments": [
+        "audio.fragment",
+        "bluetooth.fragment",
+        "fonts.fragment",
+        "mender-rpi.fragment",
+        "mender-rpi5.fragment",
+        "rpi-bluetooth.fragment",
+        "rpi4-kms.fragment",
+        "rpi-wifi.fragment",
+        "retroarch-kms.fragment"
+      ]
+    }],
+    "output_tree": "retroroot",
+    "config_dir_tree": "retroroot",
+    "config_dir_name": "configs",
+    "output_dir_name": "output"
+  }]
+}

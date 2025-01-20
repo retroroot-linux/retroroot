@@ -1,0 +1,2 @@
+BR2_PACKAGE_MENDER_GRUBENV_DEFINES="retroroot/board/raspberrypi/raspberrypi5/mender_grubenv_defines"
+

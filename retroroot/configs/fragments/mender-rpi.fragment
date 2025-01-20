@@ -1,11 +1,10 @@
 # Mender uses GRUB on top of uboot
 BR2_TARGET_GRUB2=y
-BR2_TARGET_GRUB2_BUILTIN_MODULES="boot linux ext2 fat serial part_msdos part_gpt normal efi_gop iso9660 configfile search loadenv test cat echo gcry_sha256 halt hashsum sleep reboot regexp loadenv test"
+BR2_TARGET_GRUB2_BUILTIN_MODULES_EFI="boot linux ext2 fat serial part_msdos part_gpt normal efi_gop iso9660 configfile search loadenv test cat echo gcry_sha256 halt hashsum sleep reboot regexp loadenv test"
 BR2_TARGET_GRUB2_INSTALL_TOOLS=y
 BR2_TARGET_GRUB2_ARM_EFI=y
 BR2_TARGET_UBOOT=y
-BR2_TARGET_UBOOT_BOARD_DEFCONFIG="rpi_4_32b"
-BR2_TARGET_UBOOT_CONFIG_FRAGMENT_FILES="retroroot/board/raspberrypi/common/fast_uboot"
+BR2_TARGET_UBOOT_CONFIG_FRAGMENT_FILES="retroroot/board/raspberrypi/common/kconfig_stubs/fast_uboot"
 BR2_TARGET_UBOOT_NEEDS_DTC=y
 BR2_TARGET_UBOOT_NEEDS_OPENSSL=y
 BR2_PACKAGE_MENDER=y

@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -eu
+
+add_tty() {
+  mkdir -p "${TARGET_DIR}/etc/systemd/system/getty.target.wants"
+  ln -sf /lib/systemd/system/getty@.service \
+    "${TARGET_DIR}/etc/systemd/system/getty.target.wants/getty@tty1.service"
+
+  if [[ -e "${TARGET_DIR}"/etc/inittab ]]; then
+    check=$(grep -E '^tty1::' "${TARGET_DIR}"/etc/inittab || true)
+    if [[ -z "${check}" ]]; then
+        sed -i '/GENERIC_SERIAL/atty1::respawn:/sbin/getty -L  tty1 0 vt100 # HDMI console' "${TARGET_DIR}"/etc/inittab
+    fi
+  fi
+}

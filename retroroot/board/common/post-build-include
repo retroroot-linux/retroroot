@@ -5,13 +5,16 @@ DEVICE_TYPE="mender"
 
 # shellcheck disable=SC2154
 setup_mender(){
-  echo "device_type=${DEVICE_TYPE}" > "${TARGET_DIR}"/etc/mender/device_type
-  mkdir -p "${TARGET_DIR}"/data
-  cd "${TARGET_DIR}"
-  mkdir -p var/lock
-  rm -rf var/lib/mender
-  cd var/lib
-  ln -sf /data/mender mender
+  check=$(grep -w "BR2_PACKAGE_MENDER=y" "${BR2_CONFIG}" || true)
+  if [[ -n "${check}" ]]; then
+    echo "device_type=${DEVICE_TYPE}" > "${TARGET_DIR}"/etc/mender/device_type
+    mkdir -p "${TARGET_DIR}"/data
+    cd "${TARGET_DIR}"
+    mkdir -p var/lock
+    rm -rf var/lib/mender
+    cd var/lib
+    ln -sf /data/mender mender
+  fi
 }
 
 

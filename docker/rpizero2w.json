@@ -1,0 +1,34 @@
+{
+  "buildroot_dir": "buildroot",
+  "user": "br-user",
+  "exit_after_build": false,
+  "update_buildroot": false,
+  "configs": [{
+    "build": true,
+    "clean": false,
+    "remove": true,
+    "skip": false,
+    "verbose": false,
+    "defconfig": "raspberrypizero2w_defconfig",
+    "external_trees": [{
+      "name": "retroroot",
+      "fragment_dir": "configs/fragments",
+      "fragments": [
+        "audio.fragment",
+        "bluetooth.fragment",
+        "fonts.fragment",
+        "i18n.fragment",
+        "networking-tools.fragment",
+        "mesa3d.fragment",
+        "rpi-bluetooth.fragment",
+        "rpi3-kms.fragment",
+        "rpi-wifi.fragment",
+        "retroarch-kms.fragment"
+      ]
+    }],
+    "output_tree": "retroroot",
+    "config_dir_tree": "retroroot",
+    "config_dir_name": "configs",
+    "output_dir_name": "output"
+  }]
+}
